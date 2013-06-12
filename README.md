@@ -55,11 +55,11 @@ Creates a texture from an [ndarray](https://github.com/mikolalysenko/ndarray).  
 
 | `dtype`      | `shape`    | `format`        | `type`                 |
 | ------------ |:----------:|:---------------:|:----------------------:|
-| `float32|64` | [m,n]      | LUMINANCE       | FLOAT                  |
-| `float32|64` | [m,n,1]    | ALPHA           | FLOAT                  |
-| `float32|64` | [m,n,2]    | LUMINANCE_ALPHA | FLOAT                  |
-| `float32|64` | [m,n,3]    | RGB             | FLOAT                  |
-| `float32|64` | [m,n,4]    | RGBA            | FLOAT                  |
+| `float32/64` | [m,n]      | LUMINANCE       | FLOAT                  |
+| `float32/64` | [m,n,1]    | ALPHA           | FLOAT                  |
+| `float32/64` | [m,n,2]    | LUMINANCE_ALPHA | FLOAT                  |
+| `float32/64` | [m,n,3]    | RGB             | FLOAT                  |
+| `float32/64` | [m,n,4]    | RGBA            | FLOAT                  |
 | `uint8`      | [m,n]      | LUMINANCE       | UNSIGNED_BYTE          |
 | `uint8`      | [m,n,1]    | ALPHA           | UNSIGNED_BYTE          |
 | `uint8`      | [m,n,2]    | LUMINANCE_ALPHA | UNSIGNED_BYTE          |
