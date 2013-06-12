@@ -53,6 +53,8 @@ Creates a texture from an [ndarray](https://github.com/mikolalysenko/ndarray).  
 * `dtype = ndarray.dtype(array)`
 * `shape = array.shape`
 
+Then the rules for `type` and `format` are defined according to the following table:
+
 | `dtype`      | `shape`    | `format`        | `type`                 |
 | ------------ |:----------:|:---------------:|:----------------------:|
 | `float32/64` | [m,n]      | LUMINANCE       | FLOAT                  |
@@ -68,7 +70,7 @@ Creates a texture from an [ndarray](https://github.com/mikolalysenko/ndarray).  
 | `uint16`     | [m,n]      | RGBA            | UNSIGNED_SHORT_4_4_4_4 |
 | `uint32`     | [m,n]      | RGBA            | UNSIGNED_BYTE          |
 
-
+Other combinations of shape and dtype are invalid and throw an error.
 
 ## Texture Methods
 
