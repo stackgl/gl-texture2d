@@ -86,6 +86,9 @@ Generates mipmaps for the texture.
 ### `tex.handle`
 A handles to the underlying texture object.
 
+### `tex.shape`
+An array representing the `[height, width]` of the texture
+
 ### `tex.wrapS`
 S wrap around behavior
 
