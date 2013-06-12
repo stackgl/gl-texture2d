@@ -53,9 +53,8 @@ Creates a texture from an [ndarray](https://github.com/mikolalysenko/ndarray).  
 * `dtype = ndarray.dtype(array)`
 * `shape = array.shape`
 
-+--------------+------------+-----------------+------------------------+
 | `dtype`      | `shape`    | `format`        | `type`                 |
-+--------------+------------+-----------------+------------------------+
+| ------------ |:----------:|:---------------:|:----------------------:|
 | `float32|64` | [m,n]      | LUMINANCE       | FLOAT                  |
 | `float32|64` | [m,n,1]    | ALPHA           | FLOAT                  |
 | `float32|64` | [m,n,2]    | LUMINANCE_ALPHA | FLOAT                  |
@@ -68,7 +67,6 @@ Creates a texture from an [ndarray](https://github.com/mikolalysenko/ndarray).  
 | `uint8`      | [m,n,4]    | RGBA            | UNSIGNED_BYTE          |
 | `uint16`     | [m,n]      | RGBA            | UNSIGNED_SHORT_4_4_4_4 |
 | `uint32`     | [m,n]      | RGBA            | UNSIGNED_BYTE          |
-+--------------+------------+-----------------+------------------------+
 
 
 
