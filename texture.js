@@ -70,7 +70,7 @@ Texture2D.prototype.bind = function bindTexture2D(unit) {
   if(unit !== undefined) {
     return unit
   }
-  return gl.getParameter(gl.ACTIVE_TEXTURE)
+  return gl.getParameter(gl.ACTIVE_TEXTURE) - gl.TEXTURE0
 }
 
 Texture2D.prototype.dispose = function disposeTexture2D() {
