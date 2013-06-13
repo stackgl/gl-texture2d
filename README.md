@@ -132,14 +132,16 @@ gl.deleteTexture(this.handle)
 ```
 
 ### `tex.setPixels(data[, x_off, y_off, mip_level])`
-Unpacks `data` into a subregion of the texture.  As before in the constructor `data` can be either an `ndarray`, `HTMLCanvas`, `HTMLImage` or `HTMLVideo` object.
+Unpacks `data` into a subregion of the texture.  As before in the constructor `data` can be either an `ndarray`, `HTMLCanvas`, `HTMLImage` or `HTMLVideo` object.  If `data` is an ndarray it must have a compatible format with the initial array layout.
 
 * `x_off` is the x offset to write from. (default `0`)
 * `y_off` is the y offset to write from. (default `0`)
 * `mip_level` is the mip level to write to. (default `0`)
 
+
+
 ### `tex.generateMipmaps()`
-Generates mipmaps for the texture.
+Generates mipmaps for the texture.  This will fail if the texture dimensions are not a power of two.
 
 ## Texture Properties
 
@@ -150,16 +152,16 @@ A handles to the underlying texture object.
 An array representing the `[height, width]` of the texture
 
 ### `tex.wrapS`
-S wrap around behavior
+S wrap around behavior.  Used to set/get `gl.TEXTURE_WRAP_S`
 
 ### `tex.wrapT`
-T wrap around behavior
+T wrap around behavior.  Used to set/get `gl.TEXTURE_WRAP_T`
 
 ### `tex.magFilter`
-Magnification filter
+Magnification filter.  Used to set/get `gl.TEXTURE_MAG_FILTER`
 
 ### `tex.minFilter`
-Minification filter
+Minification filter. Used to set/get `gl.TEXTURE_MIN_FILTER`
 
 # Credits
 (c) 2013 Mikola Lysenko. MIT License
