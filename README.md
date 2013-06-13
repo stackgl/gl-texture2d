@@ -97,18 +97,16 @@ Then the rules for `type` and `format` are defined according to the following ta
 
 | `dtype`      | `shape`    | `format`        | `type`                 |
 | ------------ |:----------:|:---------------:|:----------------------:|
-| `float32/64` | [m,n]      | LUMINANCE       | FLOAT                  |
-| `float32/64` | [m,n,1]    | ALPHA           | FLOAT                  |
-| `float32/64` | [m,n,2]    | LUMINANCE_ALPHA | FLOAT                  |
-| `float32/64` | [m,n,3]    | RGB             | FLOAT                  |
-| `float32/64` | [m,n,4]    | RGBA            | FLOAT                  |
-| `uint8`      | [m,n]      | LUMINANCE       | UNSIGNED_BYTE          |
-| `uint8`      | [m,n,1]    | ALPHA           | UNSIGNED_BYTE          |
-| `uint8`      | [m,n,2]    | LUMINANCE_ALPHA | UNSIGNED_BYTE          |
-| `uint8`      | [m,n,3]    | RGB             | UNSIGNED_BYTE          |
-| `uint8`      | [m,n,4]    | RGBA            | UNSIGNED_BYTE          |
-| `uint16`     | [m,n]      | RGBA            | UNSIGNED_SHORT_4_4_4_4 |
-| `uint32`     | [m,n]      | RGBA            | UNSIGNED_BYTE          |
+| `float*`     | [m,n]      | LUMINANCE       | FLOAT                  |
+| `float*`     | [m,n,1]    | ALPHA           | FLOAT                  |
+| `float*`     | [m,n,2]    | LUMINANCE_ALPHA | FLOAT                  |
+| `float*`     | [m,n,3]    | RGB             | FLOAT                  |
+| `float*`     | [m,n,4]    | RGBA            | FLOAT                  |
+| `(u)int*`    | [m,n]      | LUMINANCE       | UNSIGNED_BYTE          |
+| `(u)int*`    | [m,n,1]    | ALPHA           | UNSIGNED_BYTE          |
+| `(u)int*`    | [m,n,2]    | LUMINANCE_ALPHA | UNSIGNED_BYTE          |
+| `(u)int*`    | [m,n,3]    | RGB             | UNSIGNED_BYTE          |
+| `(u)int*`    | [m,n,4]    | RGBA            | UNSIGNED_BYTE          |
 
 Other combinations of shape and dtype are invalid and throw an error.
 
@@ -139,7 +137,7 @@ Unpacks `data` into a subregion of the texture.  As before in the constructor `d
 * `y_off` is the y offset to write from. (default `0`)
 * `mip_level` is the mip level to write to. (default `0`)
 
-
+If `data` is an `ndarray` the same rules as in the constructor are followed for converting the type of the buffer.
 
 ### `tex.generateMipmaps()`
 Generates mipmaps for the texture.  This will fail if the texture dimensions are not a power of two.

@@ -4,6 +4,21 @@ var ndarray = require("ndarray")
 var ops = require("ndarray-ops")
 var pool = require("typedarray-pool")
 var webglew = require("webglew")
+var cwise = require("cwise")
+
+var convertFloatToUint8 = cwise({
+  args: ["array", "array"],
+  body: function(out, inp) {
+    var x = 255 * inp
+    if(x < 0) {
+      out = 0
+    } else if(x > 255) {
+      out = 255
+    } else {
+      out = x|0
+    }
+  }
+})
 
 function Texture2D(gl, handle, width, height, format, type) {
   this.gl = gl
@@ -92,15 +107,93 @@ Texture2D.prototype.setPixels = function(data, x_off, y_off, mip_level) {
      data instanceof ImageData ||
      data instanceof HTMLImageElement ||
      data instanceof HTMLVideoElement) {
-    gl.texSubImage2D(gl.TEXTURE_2D, 0, x_off, y_off, this.format, this.target, data)
+    gl.texSubImage2D(gl.TEXTURE_2D, mip_level, x_off, y_off, this.format, this.type, data)
   } else if(data.shape && data.stride && data.data) {
-    
-  
+    if(data.shape.length < 2 ||
+       x_off + data.shape[1] > this.shape[1]>>>mip_level ||
+       y_off + data.shape[0] > this.shape[0]>>>mip_level ||
+       x_off < 0 ||
+       y_off < 0) {
+      throw new Error("Texture dimensions are out of bounds")
+    }
+    texSubImageArray(gl, x_off, y_off, mip_level, this.format, this.type, data)
   } else {
-    throw new Error("Unsupported data format")
+    throw new Error("Unsupported data type")
   }
 }
 
+function texSubImageArray(gl, x_off, y_off, mip_level, cformat, ctype, array) {
+  var dtype = ndarray.dtype(array)
+  var shape = array.shape
+  var packed = isPacked(array)
+  var type = 0, format = 0
+  if(dtype === "float32") {
+    type = gl.FLOAT
+  } else if(dtype === "float64") {
+    type = gl.FLOAT
+    packed = false
+    dtype = "float32"
+  } else if(dtype === "uint8") {
+    type = gl.UNSIGNED_BYTE
+  } else {
+    type = gl.UNSIGNED_BYTE
+    packed = false
+  }
+  if(shape.length === 2) {
+    format = gl.LUMINANCE
+  } else if(shape.length === 3) {
+    if(shape[2] === 1) {
+      format = gl.ALPHA
+    } else if(shape[2] === 2) {
+      format = gl.LUMINANCE_ALPHA
+    } else if(shape[2] === 3) {
+      format = gl.RGB
+    } else if(shape[2] === 4) {
+      format = gl.RGBA
+    } else {
+      throw new Error("Invalid shape for pixel coords")
+    }
+  } else {
+    throw new Error("Invalid shape for texture")
+  }
+  //For 1-channel textures allow conversion between formats
+  if((format  === gl.LUMINANCE || format  === gl.ALPHA) &&
+     (cformat === gl.LUMINANCE || cformat === gl.ALPHA)) {
+    format = cformat
+  }
+  if(format !== cformat) {
+    throw new Error("Incompatible texture format for setPixels")
+  }
+  var size = ndarray.size(array)
+  if(type === ctype && packed) {
+    //Array data types are compatible, can directly copy into texture
+    if(array.offset === 0 && array.data.length === size) {
+      gl.texSubImage2D(gl.TEXTURE_2D, mip_level, x_off, y_off, shape[1], shape[0], format, type, array.data)
+    } else {
+      gl.texSubImage2D(gl.TEXTURE_2D, mip_level, x_off, y_off, shape[1], shape[0], format, type, array.data.subarray(array.offset, array.offset+size))
+    }
+  } else {
+    //Need to do type conversion to pack data into buffer
+    var pack_buffer
+    if(ctype === gl.FLOAT) {
+      pack_buffer = pool.mallocFloat32(size)
+    } else {
+      pack_buffer = pool.mallocUint8(size)
+    }
+    var pack_view = ndarray(pack_buffer, shape)
+    if(type === gl.FLOAT && ctype === gl.UNSIGNED_BYTE) {
+      convertFloatToUint8(pack_view, array)
+    } else {
+      ops.assign(pack_view, array)
+    }
+    gl.texSubImage2D(gl.TEXTURE_2D, mip_level, x_off, y_off, shape[1], shape[0], format, ctype, pack_buffer.subarray(0, size))
+    if(ctype === gl.FLOAT) {
+      pool.freeFloat32(pack_buffer)
+    } else {
+      pool.freeUint8(pack_buffer)
+    }
+  }
+}
 
 function initTexture(gl) {
   var tex = gl.createTexture()
@@ -142,44 +235,36 @@ function createTextureArray(gl, array) {
   var dtype = ndarray.dtype(array)
   var shape = array.shape
   var packed = isPacked(array)
-  var type
-  var format
-  if("uint16" === dtype && shape.length === 2) {
-    type = gl.RGBA
-    format = gl.UNSIGNED_BYTE
-  } else if("uint32" === dtype && shape.length === 2) {
-    type = gl.RGBA
-    format = gl.UNSIGNED_SHORT_4_4_4_4
+  var type = 0
+  if(dtype === "float32") {
+    type = gl.FLOAT
+  } else if(dtype === "float64") {
+    type = gl.FLOAT
+    packed = false
+    dtype = "float32"
+  } else if(dtype === "uint8") {
+    type = gl.UNSIGNED_BYTE
   } else {
-    if(dtype === "float32") {
-      type = gl.FLOAT
-    } else if(dtype === "float64") {
-      type = gl.FLOAT
-      packed = false
-      dtype = "float32"
-    } else if(dtype === "uint8") {
-      type = gl.UNSIGNED_BYTE
+    type = gl.UNSIGNED_BYTE
+    packed = false
+  }
+  var format = 0
+  if(shape.length === 2) {
+    format = gl.LUMINANCE
+  } else if(shape.length === 3) {
+    if(shape[2] === 1) {
+      format = gl.ALPHA
+    } else if(shape[2] === 2) {
+      format = gl.LUMINANCE_ALPHA
+    } else if(shape[2] === 3) {
+      format = gl.RGB
+    } else if(shape[2] === 4) {
+      format = gl.RGBA
     } else {
-      throw new Error("Unsupported data type for ndarray texture")
+      throw new Error("Invalid shape for pixel coords")
     }
-    var format
-    if(shape.length === 2) {
-      format = gl.LUMINANCE
-    } else if(shape.length === 3) {
-      if(shape[2] === 1) {
-        format = gl.ALPHA
-      } else if(shape[2] === 2) {
-        format = gl.LUMINANCE_ALPHA
-      } else if(shape[2] === 3) {
-        format = gl.RGB
-      } else if(shape[2] === 4) {
-        format = gl.RGBA
-      } else {
-        throw new Error("Invalid shape for pixel coords")
-      }
-    } else {
-      throw new Error("Invalid shape for texture")
-    }
+  } else {
+    throw new Error("Invalid shape for texture")
   }
   if(type === gl.FLOAT && !!webglew(gl).texture_float) {
     type = gl.UNSIGNED_BYTE
@@ -194,7 +279,12 @@ function createTextureArray(gl, array) {
       sz *= shape[i]
     }
     buf_store = pool.malloc(sz, dtype)
-    ops.assign(ndarray.ctor(buf_store, array.shape, stride, 0), array)
+    var buf_array = ndarray.ctor(buf_store, array.shape, stride, 0)
+    if((dtype === "float32" || dtype === "float64") && type === gl.UNSIGNED_BYTE) {
+      convertFloatToUint8(buf_array, array)
+    } else {
+      ops.assign(buf_array, array)
+    }
     buffer = buf_store.subarray(0, sz)
   } else {
     buffer = array.data.subarray(array.offset, array.offset + ndarray.size(array))
@@ -204,7 +294,7 @@ function createTextureArray(gl, array) {
   if(!packed) {
     pool.free(buf_store)
   }
-  return new Texture2D(gl, tex, shape[1], shape[0], format, dtype)
+  return new Texture2D(gl, tex, shape[1], shape[0], format, type)
 }
 
 function createTexture2D(gl) {
