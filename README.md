@@ -145,8 +145,17 @@ Generates mipmaps for the texture.  This will fail if the texture dimensions are
 
 ## Texture Properties
 
+### `tex.gl`
+A reference to the WebGL context of the texture.
+
 ### `tex.handle`
-A handles to the underlying texture object.
+A handle to the underlying texture object.
+
+### `tex.format`
+The internal format of the texture.
+
+### `tex.type`
+The internal data type of the texture.
 
 ### `tex.shape`
 An array representing the `[height, width]` of the texture
