@@ -67,6 +67,10 @@ Texture2D.prototype.bind = function bindTexture2D(unit) {
     gl.activeTexture(gl.TEXTURE0 + (unit|0))
   }
   gl.bindTexture(gl.TEXTURE_2D, this.handle)
+  if(unit !== undefined) {
+    return unit
+  }
+  return gl.getParameter(gl.ACTIVE_TEXTURE)
 }
 
 Texture2D.prototype.dispose = function disposeTexture2D() {
@@ -79,7 +83,22 @@ Texture2D.prototype.generateMipmap = function() {
 }
 
 Texture2D.prototype.setPixels = function(data, x_off, y_off, mip_level) {
-  throw new Error("Not yet implemented")
+  var gl = this.gl
+  this.bind()
+  x_off = x_off || 0
+  y_off = y_off || 0
+  mip_level = mip_level || 0
+  if(data instanceof HTMLCanvasElement ||
+     data instanceof ImageData ||
+     data instanceof HTMLImageElement ||
+     data instanceof HTMLVideoElement) {
+    gl.texSubImage2D(gl.TEXTURE_2D, 0, x_off, y_off, this.format, this.target, data)
+  } else if(data.shape && data.stride && data.data) {
+    
+  
+  } else {
+    throw new Error("Unsupported data format")
+  }
 }
 
 

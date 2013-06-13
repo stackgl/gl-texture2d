@@ -1,6 +1,6 @@
 gl-texture2d
 ============
-ndarray compatible wrapper for WebGLTexture objects
+[ndarray](https://github.com/mikolalysenko/ndarray) compatible wrapper for [WebGLTexture objects](http://www.khronos.org/registry/webgl/specs/latest/)
 
 # Example
 
@@ -121,8 +121,9 @@ Binds the texture for use.  Basically a short cut for:
 gl.activeTexture(gl.TEXTURE0 + tex_unit)
 gl.bindTexture(gl.TEXTURE_2D, this.handle)
 ```
-
 If `tex_unit` is not specified then the active texture is not changed.
+
+**Returns** The texture unit the texture is bound to.
 
 ### `tex.dispose()``
 Destroys the texture object and releases all of its resources.  Under the hood this is equivalent to:
