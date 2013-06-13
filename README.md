@@ -54,7 +54,7 @@ shell.on("gl-render", function() {
 
 Here is what it should look like:
 
-<img src="lena.png">
+<img src="https://raw.github.com/mikolalysenko/gl-texture2d/master/screenshot.png">
 
 # Install
 
