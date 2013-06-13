@@ -1,0 +1,40 @@
+{
+  "name": "gl-texture2d",
+  "version": "0.0.0",
+  "description": "WebGL texture wrapper",
+  "main": "texture.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mikolalysenko/gl-texture2d.git"
+  },
+  "keywords": [
+    "webgl",
+    "texture",
+    "wrap",
+    "ndarray"
+  ],
+  "author": "Mikola Lysenko",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "0d66ce40f2e25b0715689758e9a659f6544f9f3e",
+  "bugs": {
+    "url": "https://github.com/mikolalysenko/gl-texture2d/issues"
+  },
+  "devDependencies": {
+    "gl-now": "0.0.0",
+    "gl-shader": "0.0.0",
+    "lena": "~0.1.2"
+  },
+  "dependencies": {
+    "webglew": "0.0.0",
+    "ndarray": "~0.2.4",
+    "typedarray-pool": "~0.1.1",
+    "ndarray-ops": "~0.1.3"
+  }
+}

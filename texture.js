@@ -79,14 +79,15 @@ Texture2D.prototype.generateMipmap = function() {
 }
 
 Texture2D.prototype.setPixels = function(data, x_off, y_off, mip_level) {
+  throw new Error("Not yet implemented")
 }
 
 
 function initTexture(gl) {
-  var tex = gl.createTexture2D()
-  gl.bind(gl.TEXTURE_2D, tex)
-  gl.texParameteri(gl.TEXTURE_2D, gl.MIN_FILTER, gl.NEAREST)
-  gl.texParameteri(gl.TEXTURE_2D, gl.MAG_FILTER, gl.NEAREST)
+  var tex = gl.createTexture()
+  gl.bindTexture(gl.TEXTURE_2D, tex)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
   return tex
@@ -104,9 +105,9 @@ function createTextureDOM(gl, element, format, type) {
   return new Texture2D(gl, tex, element.width|0, element.height|0, format, type)
 }
 
-function isPacked(arr) {
-  var shape = arr.shape
-  var stride = arr.stride
+function isPacked(array) {
+  var shape = array.shape
+  var stride = array.stride
   var s = 1
   for(var i=shape.length-1; i>=0; --i) {
     if(stride[i] !== s) {
@@ -121,7 +122,7 @@ function isPacked(arr) {
 function createTextureArray(gl, array) {
   var dtype = ndarray.dtype(array)
   var shape = array.shape
-  var packed = isPacked(arr)
+  var packed = isPacked(array)
   var type
   var format
   if("uint16" === dtype && shape.length === 2) {
@@ -161,12 +162,10 @@ function createTextureArray(gl, array) {
       throw new Error("Invalid shape for texture")
     }
   }
-  //Check if floating point textures are supported
   if(type === gl.FLOAT && !!webglew(gl).texture_float) {
     type = gl.UNSIGNED_BYTE
     packed = false
   }
-  //If array is not packed, then we need to repack array
   var buffer, buf_store
   if(!packed) {
     var sz = 1
@@ -181,14 +180,11 @@ function createTextureArray(gl, array) {
   } else {
     buffer = array.data.subarray(array.offset, array.offset + ndarray.size(array))
   }
-  //Now that we are done, we can initialize the texture
   var tex = initTexture(gl)
   gl.texImage2D(gl.TEXTURE_2D, 0, format, shape[1], shape[0], 0, format, type, buffer)
-  //Release extra buffer storage
   if(!packed) {
     pool.free(buf_store)
   }
-  //Done!
   return new Texture2D(gl, tex, shape[1], shape[0], format, dtype)
 }
 
