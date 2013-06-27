@@ -164,7 +164,10 @@ function texSubImageArray(gl, x_off, y_off, mip_level, cformat, ctype, array) {
   if(format !== cformat) {
     throw new Error("Incompatible texture format for setPixels")
   }
-  var size = ndarray.size(array)
+  var size = array.size
+  if(typeof size !== "number") {
+    size = ndarray.size(array)
+  }
   if(type === ctype && packed) {
     //Array data types are compatible, can directly copy into texture
     if(array.offset === 0 && array.data.length === size) {
@@ -287,7 +290,11 @@ function createTextureArray(gl, array) {
     }
     buffer = buf_store.subarray(0, sz)
   } else {
-    buffer = array.data.subarray(array.offset, array.offset + ndarray.size(array))
+    var array_size = array.size
+    if(typeof array_size !== "number") {
+      array_size = ndarray.size(array)
+    }
+    buffer = array.data.subarray(array.offset, array.offset + array_size)
   }
   var tex = initTexture(gl)
   gl.texImage2D(gl.TEXTURE_2D, 0, format, shape[1], shape[0], 0, format, type, buffer)
