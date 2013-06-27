@@ -123,7 +123,7 @@ Texture2D.prototype.setPixels = function(data, x_off, y_off, mip_level) {
 }
 
 function texSubImageArray(gl, x_off, y_off, mip_level, cformat, ctype, array) {
-  var dtype = ndarray.dtype(array)
+  var dtype = array.dtype || ndarray.dtype(array)
   var shape = array.shape
   var packed = isPacked(array)
   var type = 0, format = 0
@@ -232,7 +232,7 @@ function isPacked(array) {
 
 //Creates a texture from an ndarray
 function createTextureArray(gl, array) {
-  var dtype = ndarray.dtype(array)
+  var dtype = array.dtype || ndarray.dtype(array)
   var shape = array.shape
   var packed = isPacked(array)
   var type = 0
@@ -279,7 +279,7 @@ function createTextureArray(gl, array) {
       sz *= shape[i]
     }
     buf_store = pool.malloc(sz, dtype)
-    var buf_array = ndarray.ctor(buf_store, array.shape, stride, 0)
+    var buf_array = ndarray(buf_store, array.shape, stride, 0)
     if((dtype === "float32" || dtype === "float64") && type === gl.UNSIGNED_BYTE) {
       convertFloatToUint8(buf_array, array)
     } else {
