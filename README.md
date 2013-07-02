@@ -144,18 +144,6 @@ Generates mipmaps for the texture.  This will fail if the texture dimensions are
 
 ## Texture Properties
 
-### `tex.gl`
-A reference to the WebGL context of the texture.
-
-### `tex.handle`
-A handle to the underlying texture object.
-
-### `tex.format`
-The internal format of the texture.
-
-### `tex.type`
-The internal data type of the texture.
-
 ### `tex.shape`
 An array representing the `[height, width]` of the texture
 
@@ -170,6 +158,21 @@ Magnification filter.  Used to set/get `gl.TEXTURE_MAG_FILTER`
 
 ### `tex.minFilter`
 Minification filter. Used to set/get `gl.TEXTURE_MIN_FILTER`
+
+## Internals
+
+### `tex.gl`
+A reference to the WebGL context of the texture.
+
+### `tex.handle`
+A handle to the underlying texture object.
+
+### `tex.format`
+The internal format of the texture.
+
+### `tex.type`
+The internal data type of the texture.
+
 
 # Credits
 (c) 2013 Mikola Lysenko. MIT License

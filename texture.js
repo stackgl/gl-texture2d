@@ -26,6 +26,7 @@ function Texture2D(gl, handle, width, height, format, type) {
   this.shape = [ height, width ]
   this.format = format
   this.type = type
+  this._mipLevels = [0]
   this._magFilter = gl.NEAREST
   this._minFilter = gl.NEAREST
   this._wrapS = gl.REPEAT
@@ -95,6 +96,14 @@ Texture2D.prototype.dispose = function disposeTexture2D() {
 Texture2D.prototype.generateMipmap = function() {
   this.bind()
   this.gl.generateMipmap(this.gl.TEXTURE_2D)
+  
+  //Update mip levels
+  var l = Math.min(this.shape[0], this.shape[1])
+  for(var i=0; l>0; ++i, l>>>=1) {
+    if(this._mipLevels.indexOf(i) < 0) {
+      this._mipLevels.push(i)
+    }
+  }
 }
 
 Texture2D.prototype.setPixels = function(data, x_off, y_off, mip_level) {
@@ -107,7 +116,13 @@ Texture2D.prototype.setPixels = function(data, x_off, y_off, mip_level) {
      data instanceof ImageData ||
      data instanceof HTMLImageElement ||
      data instanceof HTMLVideoElement) {
-    gl.texSubImage2D(gl.TEXTURE_2D, mip_level, x_off, y_off, this.format, this.type, data)
+    var needsMip = this._mipLevels.indexOf(mip_level) < 0
+    if(needsMip) {
+      gl.texImage2D(gl.TEXTURE_2D, 0, this.format, this.format, this.type, data)
+      this._mipLevels.push(mip_level)
+    } else {
+      gl.texSubImage2D(gl.TEXTURE_2D, mip_level, x_off, y_off, this.format, this.type, data)
+    }
   } else if(data.shape && data.stride && data.data) {
     if(data.shape.length < 2 ||
        x_off + data.shape[1] > this.shape[1]>>>mip_level ||
@@ -115,14 +130,14 @@ Texture2D.prototype.setPixels = function(data, x_off, y_off, mip_level) {
        x_off < 0 ||
        y_off < 0) {
       throw new Error("Texture dimensions are out of bounds")
-    }
-    texSubImageArray(gl, x_off, y_off, mip_level, this.format, this.type, data)
+    }    
+    texSubImageArray(gl, x_off, y_off, mip_level, this.format, this.type, this._mipLevels, data)
   } else {
     throw new Error("Unsupported data type")
   }
 }
 
-function texSubImageArray(gl, x_off, y_off, mip_level, cformat, ctype, array) {
+function texSubImageArray(gl, x_off, y_off, mip_level, cformat, ctype, mipLevels, array) {
   var dtype = array.dtype || ndarray.dtype(array)
   var shape = array.shape
   var packed = isPacked(array)
@@ -168,12 +183,24 @@ function texSubImageArray(gl, x_off, y_off, mip_level, cformat, ctype, array) {
   if(typeof size !== "number") {
     size = ndarray.size(array)
   }
+  var needsMip = mipLevels.indexOf(mip_level) < 0
+  if(needsMip) {
+    mipLevels.push(mip_level)
+  }
   if(type === ctype && packed) {
     //Array data types are compatible, can directly copy into texture
     if(array.offset === 0 && array.data.length === size) {
-      gl.texSubImage2D(gl.TEXTURE_2D, mip_level, x_off, y_off, shape[1], shape[0], format, type, array.data)
+      if(needsMip) {
+        gl.texImage2D(gl.TEXTURE_2D, mip_level, cformat, shape[1], shape[0], 0, cformat, ctype, array.data)
+      } else {
+        gl.texSubImage2D(gl.TEXTURE_2D, mip_level, x_off, y_off, shape[1], shape[0], cformat, ctype, array.data)
+      }
     } else {
-      gl.texSubImage2D(gl.TEXTURE_2D, mip_level, x_off, y_off, shape[1], shape[0], format, type, array.data.subarray(array.offset, array.offset+size))
+      if(needsMip) {
+        gl.texImage2D(gl.TEXTURE_2D, mip_level, cformat, shape[1], shape[0], 0, cformat, ctype, array.data.subarray(array.offset, array.offset+size))
+      } else {
+        gl.texSubImage2D(gl.TEXTURE_2D, mip_level, x_off, y_off, shape[1], shape[0], cformat, ctype, array.data.subarray(array.offset, array.offset+size))
+      }
     }
   } else {
     //Need to do type conversion to pack data into buffer
@@ -189,7 +216,11 @@ function texSubImageArray(gl, x_off, y_off, mip_level, cformat, ctype, array) {
     } else {
       ops.assign(pack_view, array)
     }
-    gl.texSubImage2D(gl.TEXTURE_2D, mip_level, x_off, y_off, shape[1], shape[0], format, ctype, pack_buffer.subarray(0, size))
+    if(needsMip) {
+      gl.texImage2D(gl.TEXTURE_2D, mip_level, cformat, shape[1], shape[0], 0, cformat, ctype, pack_buffer.subarray(0, size))
+    } else {
+      gl.texSubImage2D(gl.TEXTURE_2D, mip_level, x_off, y_off, shape[1], shape[0], cformat, ctype, pack_buffer.subarray(0, size))
+    }
     if(ctype === gl.FLOAT) {
       pool.freeFloat32(pack_buffer)
     } else {
