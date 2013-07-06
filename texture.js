@@ -31,6 +31,7 @@ function Texture2D(gl, handle, width, height, format, type) {
   this._minFilter = gl.NEAREST
   this._wrapS = gl.REPEAT
   this._wrapT = gl.REPEAT
+  this._anisoSamples = 1
 }
 
 Object.defineProperty(Texture2D.prototype, "minFilter", {
@@ -44,7 +45,9 @@ Object.defineProperty(Texture2D.prototype, "minFilter", {
   }
 })
 
-Object.defineProperty(Texture2D.prototype, "magFilter", {
+var proto = Texture2D.prototype
+
+Object.defineProperty(proto, "magFilter", {
   get: function() {
     return this._magFilter
   },
@@ -55,7 +58,7 @@ Object.defineProperty(Texture2D.prototype, "magFilter", {
   }
 })
 
-Object.defineProperty(Texture2D.prototype, "wrapS", {
+Object.defineProperty(proto, "wrapS", {
   get: function() {
     return this._wrapS
   },
@@ -66,7 +69,7 @@ Object.defineProperty(Texture2D.prototype, "wrapS", {
   }
 })
 
-Object.defineProperty(Texture2D.prototype, "wrapT", {
+Object.defineProperty(proto, "wrapT", {
   get: function() {
     return this._wrapT
   },
@@ -77,7 +80,24 @@ Object.defineProperty(Texture2D.prototype, "wrapT", {
   }
 })
 
-Texture2D.prototype.bind = function bindTexture2D(unit) {
+Object.defineProperty(proto, "mipSamples", {
+  get: function() {
+    return this._anisoSamples
+  },
+  set: function(i) {
+    var psamples = this._anisoSamples
+    this._anisoSamples = i|0
+    if(psamples !== this._anisoSamples) {
+      var ext = webglew(this.gl).EXT_texture_filter_anisotropic
+      if(ext) {
+        this.gl.texParameterf(this.gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, this._anisoSamples)
+      }
+    }
+    return this._anisoSamples
+  }
+})
+
+proto.bind = function bindTexture2D(unit) {
   var gl = this.gl
   if(unit !== undefined) {
     gl.activeTexture(gl.TEXTURE0 + (unit|0))
@@ -89,11 +109,11 @@ Texture2D.prototype.bind = function bindTexture2D(unit) {
   return gl.getParameter(gl.ACTIVE_TEXTURE) - gl.TEXTURE0
 }
 
-Texture2D.prototype.dispose = function disposeTexture2D() {
+proto.dispose = function disposeTexture2D() {
   this.gl.deleteTexture(this.handle)
 }
 
-Texture2D.prototype.generateMipmap = function() {
+proto.generateMipmap = function() {
   this.bind()
   this.gl.generateMipmap(this.gl.TEXTURE_2D)
   
@@ -106,7 +126,7 @@ Texture2D.prototype.generateMipmap = function() {
   }
 }
 
-Texture2D.prototype.setPixels = function(data, x_off, y_off, mip_level) {
+proto.setPixels = function(data, x_off, y_off, mip_level) {
   var gl = this.gl
   this.bind()
   x_off = x_off || 0

@@ -144,33 +144,36 @@ Generates mipmaps for the texture.  This will fail if the texture dimensions are
 
 ## Texture Properties
 
-### `tex.shape`
+#### `tex.shape`
 An array representing the `[height, width]` of the texture
 
-### `tex.wrapS`
+#### `tex.wrapS`
 S wrap around behavior.  Used to set/get `gl.TEXTURE_WRAP_S`
 
-### `tex.wrapT`
+#### `tex.wrapT`
 T wrap around behavior.  Used to set/get `gl.TEXTURE_WRAP_T`
 
-### `tex.magFilter`
+#### `tex.magFilter`
 Magnification filter.  Used to set/get `gl.TEXTURE_MAG_FILTER`
 
-### `tex.minFilter`
+#### `tex.minFilter`
 Minification filter. Used to set/get `gl.TEXTURE_MIN_FILTER`
+
+#### `tex.mipSamples`
+The number of anisotropic filtering samples to use.  This requires `EXT_texture_filter_anisotropic` to have any effect.  High values will improve mipmap quality, but decrease performance.
 
 ## Internals
 
-### `tex.gl`
+#### `tex.gl`
 A reference to the WebGL context of the texture.
 
-### `tex.handle`
+#### `tex.handle`
 A handle to the underlying texture object.
 
-### `tex.format`
+#### `tex.format`
 The internal format of the texture.
 
-### `tex.type`
+#### `tex.type`
 The internal data type of the texture.
 
 
