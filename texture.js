@@ -368,7 +368,7 @@ function createTexture2D(gl) {
        obj instanceof HTMLImageElement ||
        obj instanceof HTMLVideoElement ||
        obj instanceof ImageData) {
-      return createTextureDOM(gl, obj, arguments[1]||gl.RGBA, arguments[2]||gl.UNSIGNED_BYTE)
+      return createTextureDOM(gl, obj, arguments[2]||gl.RGBA, arguments[3]||gl.UNSIGNED_BYTE)
     } else if(obj.shape && obj.data && obj.stride) {
       return createTextureArray(gl, obj)
     }
