@@ -139,7 +139,7 @@ Unpacks `data` into a subregion of the texture.  As before in the constructor `d
 
 If `data` is an `ndarray` the same rules as in the constructor are followed for converting the type of the buffer.
 
-### `tex.generateMipmaps()`
+### `tex.generateMipmap()`
 Generates mipmaps for the texture.  This will fail if the texture dimensions are not a power of two.
 
 ## Texture Properties
