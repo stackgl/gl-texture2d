@@ -148,16 +148,16 @@ Generates mipmaps for the texture.  This will fail if the texture dimensions are
 An array representing the `[height, width]` of the texture
 
 #### `tex.wrapS`
-S wrap around behavior.  Used to set/get `gl.TEXTURE_WRAP_S`
+S wrap around behavior.  Used to set/get `gl.TEXTURE_WRAP_S`.  Defaults to gl.CLAMP_TO_EDGE
 
 #### `tex.wrapT`
-T wrap around behavior.  Used to set/get `gl.TEXTURE_WRAP_T`
+T wrap around behavior.  Used to set/get `gl.TEXTURE_WRAP_T`. Defaults to gl.CLAMP_TO_EDGE
 
 #### `tex.magFilter`
-Magnification filter.  Used to set/get `gl.TEXTURE_MAG_FILTER`
+Magnification filter.  Used to set/get `gl.TEXTURE_MAG_FILTER`. Defaults to gl.NEAREST
 
 #### `tex.minFilter`
-Minification filter. Used to set/get `gl.TEXTURE_MIN_FILTER`
+Minification filter. Used to set/get `gl.TEXTURE_MIN_FILTER`. Defaults to gl.NEAREST
 
 #### `tex.mipSamples`
 The number of anisotropic filtering samples to use.  This requires `EXT_texture_filter_anisotropic` to have any effect.  High values will improve mipmap quality, but decrease performance.
