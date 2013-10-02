@@ -4,21 +4,14 @@ var ndarray = require("ndarray")
 var ops = require("ndarray-ops")
 var pool = require("typedarray-pool")
 var webglew = require("webglew")
-var cwise = require("cwise")
+var makeOp = require("cwise-compiler")
 
-var convertFloatToUint8 = cwise({
-  args: ["array", "array"],
-  body: function(out, inp) {
-    var x = 255 * inp
-    if(x < 0) {
-      out = 0
-    } else if(x > 255) {
-      out = 255
-    } else {
-      out = x|0
-    }
-  }
-})
+var convertFloatToUint8 = makeOp({
+  args:["array", "array"],
+  pre: {args:[], body:""},
+  post: {args:[], body:""},
+  body: {args:["a", "b"], body:"var xx=b*255;if(xx<=0){a=0}else if(xx>=255){a=255}else{a=xx}"},
+  funcName: "assign" })
 
 function Texture2D(gl, handle, width, height, format, type) {
   this.gl = gl
