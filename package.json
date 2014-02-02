@@ -36,7 +36,7 @@
     "ndarray": "~1.0.3",
     "typedarray-pool": "~0.1.1",
     "ndarray-ops": "~1.1.0",
-    "cwise": "~0.3.3",
-    "bit-twiddle": "0.0.2"
+    "bit-twiddle": "0.0.2",
+    "cwise-compiler": "~0.1.0"
   }
 }

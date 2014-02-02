@@ -6,6 +6,32 @@ var pool = require("typedarray-pool")
 var webglew = require("webglew")
 var makeOp = require("cwise-compiler")
 
+var linearTypes = null
+var filterTypes = null
+var wrapTypes = null
+
+function lazyInitLinearTypes(gl) {
+  linearTypes = [
+    gl.LINEAR,
+    gl.NEAREST_MIPMAP_LINEAR,
+    gl.LINEAR_MIPMAP_NEAREST,
+    gl.LINEAR_MIPMAP_NEAREST
+  ]
+  filterTypes = [
+    gl.NEAREST,
+    gl.LINEAR,
+    gl.NEAREST_MIPMAP_NEAREST,
+    gl.NEAREST_MIPMAP_LINEAR,
+    gl.LINEAR_MIPMAP_NEAREST,
+    gl.LINEAR_MIPMAP_LINEAR
+  ]
+  wrapTypes = [
+    gl.REPEAT,
+    gl.CLAMP_TO_EDGE,
+    gl.MIRRORED_REPEAT
+  ]
+}
+
 var convertFloatToUint8 = makeOp({
   args:["array", "array"],
   pre: {args:[], body:""},
@@ -33,7 +59,16 @@ Object.defineProperty(Texture2D.prototype, "minFilter", {
   },
   set: function(v) {
     this.bind()
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, v)
+    var gl = this.gl
+    if(this.type === gl.FLOAT && linearTypes.indexOf(v) >= 0) {
+      if(!webglew(gl).OES_texture_float_linear) {
+        v = gl.NEAREST
+      }
+    }
+    if(filterTypes.indexOf(v) < 0) {
+      throw new Error("gl-texture2d: Unknown filter mode " + v)
+    }
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, v)
     return this._minFilter = v
   }
 })
@@ -46,7 +81,16 @@ Object.defineProperty(proto, "magFilter", {
   },
   set: function(v) {
     this.bind()
-    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, v)
+    var gl = this.gl
+    if(this.type === gl.FLOAT && linearTypes.indexOf(v) >= 0) {
+      if(!webglew(gl).OES_texture_float_linear) {
+        v = gl.NEAREST
+      }
+    }
+    if(filterTypes.indexOf(v) < 0) {
+      throw new Error("gl-texture2d: Unknown filter mode " + v)
+    }
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, v)
     return this._magFilter = v
   }
 })
@@ -57,6 +101,9 @@ Object.defineProperty(proto, "wrapS", {
   },
   set: function(v) {
     this.bind()
+    if(wrapTypes.indexOf(v) < 0) {
+      throw new Error("gl-texture2d: Unknown wrap mode " + v)
+    }
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, v)
     return this._wrapS = v
   }
@@ -68,6 +115,9 @@ Object.defineProperty(proto, "wrapT", {
   },
   set: function(v) {
     this.bind()
+    if(wrapTypes.indexOf(v) < 0) {
+      throw new Error("gl-texture2d: Unknown wrap mode " + v)
+    }
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, v)
     return this._wrapT = v
   }
@@ -354,6 +404,9 @@ function createTexture2D(gl) {
   }
   if(typeof arguments[1] === "number") {
     return createTextureShape(gl, arguments[1], arguments[2], arguments[3]||gl.RGBA, arguments[4]||gl.UNSIGNED_BYTE)
+  }
+  if(!linearTypes) {
+    linearTypes = lazyInitLinearTypes(gl)
   }
   if(typeof arguments[1] === "object") {
     var obj = arguments[1]

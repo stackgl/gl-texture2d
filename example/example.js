@@ -8,6 +8,8 @@ shell.on("gl-init", function() {
   var gl = shell.gl
   
   var texture = createTexture(gl, lena)
+  texture.minFilter = gl.LINEAR
+  texture.magFilter = gl.LINEAR
   
   var shader = createShader(gl, "\
     attribute vec2 position;\
