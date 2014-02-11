@@ -406,7 +406,7 @@ function createTexture2D(gl) {
     return createTextureShape(gl, arguments[1], arguments[2], arguments[3]||gl.RGBA, arguments[4]||gl.UNSIGNED_BYTE)
   }
   if(!linearTypes) {
-    linearTypes = lazyInitLinearTypes(gl)
+    lazyInitLinearTypes(gl)
   }
   if(typeof arguments[1] === "object") {
     var obj = arguments[1]
