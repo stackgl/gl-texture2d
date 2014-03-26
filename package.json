@@ -1,6 +1,6 @@
 {
   "name": "gl-texture2d",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "WebGL texture wrapper",
   "main": "texture.js",
   "directories": {
@@ -34,7 +34,7 @@
   "dependencies": {
     "webglew": "^0.0.0",
     "ndarray": "^1.0.10",
-    "typedarray-pool": "^0.1.1",
+    "typedarray-pool": "^1.0.0",
     "ndarray-ops": "^1.1.0",
     "bit-twiddle": "^0.0.2",
     "cwise-compiler": "^0.1.0"
