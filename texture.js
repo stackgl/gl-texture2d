@@ -125,7 +125,7 @@ Object.defineProperty(proto, "mipSamples", {
   },
   set: function(i) {
     var psamples = this._anisoSamples
-    this._anisoSamples = i|0
+    this._anisoSamples = Math.max(i, 1)|0
     if(psamples !== this._anisoSamples) {
       var ext = webglew(this.gl).EXT_texture_filter_anisotropic
       if(ext) {
