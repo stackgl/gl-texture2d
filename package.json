@@ -27,9 +27,9 @@
     "url": "https://github.com/mikolalysenko/gl-texture2d/issues"
   },
   "devDependencies": {
-    "gl-now": "0.0.0",
-    "gl-shader": "0.0.0",
-    "lena": "~1.0.0"
+    "gl-now": "^1.0.1",
+    "gl-shader": "^3.0.0",
+    "lena": "^1.0.0"
   },
   "dependencies": {
     "webglew": "^1.0.0",

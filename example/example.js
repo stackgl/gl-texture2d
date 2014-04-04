@@ -36,7 +36,6 @@ shell.on("gl-init", function() {
   shader.bind()
   shader.uniforms.texture = 0
   shader.attributes.position.pointer()
-  shader.attributes.position.enable()
 })
 
 shell.on("gl-render", function() {
