@@ -161,6 +161,12 @@ Minification filter. Used to set/get `gl.TEXTURE_MIN_FILTER`. Defaults to gl.NEA
 #### `tex.mipSamples`
 The number of anisotropic filtering samples to use.  This requires `EXT_texture_filter_anisotropic` to have any effect.  High values will improve mipmap quality, but decrease performance.
 
+#### `tex.width`
+Convenience getter/setter for `tex.shape[1]`
+
+#### `tex.height`
+Convenience getter/setter for `tex.shape[0]`
+
 ## Internals
 
 #### `tex.gl`
@@ -174,7 +180,6 @@ The internal format of the texture.
 
 #### `tex.type`
 The internal data type of the texture.
-
 
 # Credits
 (c) 2013 Mikola Lysenko. MIT License

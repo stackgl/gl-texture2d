@@ -49,6 +49,24 @@ function Texture2D(gl, handle, width, height, format, type) {
   this._anisoSamples = 1
 }
 
+Object.defineProperty(Texture2D.prototype, "width", {
+  get: function() {
+    return this.shape[1]
+  },
+  set: function(v) {
+    this.shape[1] = v;
+  }
+})
+
+Object.defineProperty(Texture2D.prototype, "height", {
+  get: function() {
+    return this.shape[0]
+  },
+  set: function(v) {
+    this.shape[0] = v;
+  }
+})
+
 Object.defineProperty(Texture2D.prototype, "minFilter", {
   get: function() {
     return this._minFilter
