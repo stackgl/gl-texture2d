@@ -1,6 +1,6 @@
 {
   "name": "gl-texture2d",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "WebGL texture wrapper",
   "main": "texture.js",
   "directories": {
