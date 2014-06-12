@@ -70,11 +70,10 @@ var createTexture = require("gl-texture2d")
 ## Constructor
 There are three basic usage patterns for `createTexture`:
 
-### `var tex = createTexture(gl, width, height[, format, type])`
+### `var tex = createTexture(gl, shape[, format, type])`
 Creates an unitialized texture with the given dimensions and format
 
-* `width` is the width of texture
-* `height` is the height of the texture
+* `shape` is a length 2 array representing the `[rows, columns]` of the texture
 * `format` (optional) is the format of the texture (default `gl.RGBA`)
 * `type` is the type of texture (default `gl.UNSIGNED_BYTE`)
 
@@ -152,8 +151,6 @@ An array representing the `[height, width]` of the texture.  Writing to this val
 //Resize texture to shape nw,nh
 tex.shape = [nw, nh]
 ```
-
-You can also access texture sizes using width/height directly, though assigning to these properties will not change the shape of the texture.
 
 #### `tex.wrapS`
 S wrap around behavior.  Used to set/get `gl.TEXTURE_WRAP_S`.  Defaults to gl.CLAMP_TO_EDGE
