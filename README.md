@@ -4,7 +4,7 @@ gl-texture2d
 
 # Example
 
-[Try it in your browser right now](http://mikolalysenko.github.io/gl-texture2d/)
+[Try it in your browser right now](http://gl-modules.github.io/gl-texture2d/)
 
 ```javascript
 var shell = require("gl-now")()
