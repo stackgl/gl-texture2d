@@ -1,6 +1,6 @@
 gl-texture2d
 ============
-[ndarray](https://github.com/mikolalysenko/ndarray) compatible wrapper for [WebGLTexture objects](http://www.khronos.org/registry/webgl/specs/latest/)
+WebGL texture object wrapper
 
 # Example
 
