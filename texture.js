@@ -38,9 +38,9 @@ var convertFloatToUint8 = function(out, inp) {
 function Texture2D(gl, handle, width, height, format, type) {
   this.gl = gl
   this.handle = handle
-  this.shape = [ height, width ]
   this.format = format
   this.type = type
+  this._shape = [height, width]
   this._mipLevels = [0]
   this._magFilter = gl.NEAREST
   this._minFilter = gl.NEAREST
@@ -136,6 +136,27 @@ Object.defineProperty(proto, "mipSamples", {
   }
 })
 
+Object.defineProperty(proto, "shape", {
+  get: function() {
+    return this._shape
+  }, 
+  set: function(x) {
+    if(this.height === x[0] && this.width === x[1]) {
+      return x
+    }
+    var gl = this.gl
+    var maxSize = gl.getParameter(gl.MAX_TEXTURE_SIZE)
+    if(x[0] < 0 || x[0] > maxSize || x[1] < 0 || x[1] > maxSize) {
+      throw new Error("gl-texture2d: Invalid texture size")
+    }
+    this._shape = [x[0], x[1]]
+    this.bind()
+    gl.texImage2D(gl.TEXTURE_2D, 0, this.format, x[1], x[0], 0, this.format, this.type, null)
+    this._mipLevels = [0]
+    return x
+  }
+})
+
 proto.bind = function bindTexture2D(unit) {
   var gl = this.gl
   if(unit !== undefined) {
@@ -157,7 +178,7 @@ proto.generateMipmap = function() {
   this.gl.generateMipmap(this.gl.TEXTURE_2D)
   
   //Update mip levels
-  var l = Math.min(this.shape[0], this.shape[1])
+  var l = Math.min(this._shape[0], this._shape[1])
   for(var i=0; l>0; ++i, l>>>=1) {
     if(this._mipLevels.indexOf(i) < 0) {
       this._mipLevels.push(i)
@@ -184,20 +205,20 @@ proto.setPixels = function(data, x_off, y_off, mip_level) {
     }
   } else if(data.shape && data.stride && data.data) {
     if(data.shape.length < 2 ||
-       x_off + data.shape[1] > this.shape[1]>>>mip_level ||
-       y_off + data.shape[0] > this.shape[0]>>>mip_level ||
+       x_off + data.shape[1] > this._shape[1]>>>mip_level ||
+       y_off + data.shape[0] > this._shape[0]>>>mip_level ||
        x_off < 0 ||
        y_off < 0) {
-      throw new Error("Texture dimensions are out of bounds")
-    }    
+      throw new Error("gl-texture2d: Texture dimensions are out of bounds")
+    }
     texSubImageArray(gl, x_off, y_off, mip_level, this.format, this.type, this._mipLevels, data)
   } else {
-    throw new Error("Unsupported data type")
+    throw new Error("gl-texture2d: Unsupported data type")
   }
 }
 
 function texSubImageArray(gl, x_off, y_off, mip_level, cformat, ctype, mipLevels, array) {
-  var dtype = array.dtype || ndarray.dtype(array)
+  var dtype = array.dtype
   var shape = array.shape
   var packed = isPacked(array)
   var type = 0, format = 0
@@ -212,6 +233,7 @@ function texSubImageArray(gl, x_off, y_off, mip_level, cformat, ctype, mipLevels
   } else {
     type = gl.UNSIGNED_BYTE
     packed = false
+    dtype = "uint8"
   }
   if(shape.length === 2) {
     format = gl.LUMINANCE
@@ -225,10 +247,10 @@ function texSubImageArray(gl, x_off, y_off, mip_level, cformat, ctype, mipLevels
     } else if(shape[2] === 4) {
       format = gl.RGBA
     } else {
-      throw new Error("Invalid shape for pixel coords")
+      throw new Error("gl-texture2d: Invalid shape for pixel coords")
     }
   } else {
-    throw new Error("Invalid shape for texture")
+    throw new Error("gl-texture2d: Invalid shape for texture")
   }
   //For 1-channel textures allow conversion between formats
   if((format  === gl.LUMINANCE || format  === gl.ALPHA) &&
@@ -236,12 +258,9 @@ function texSubImageArray(gl, x_off, y_off, mip_level, cformat, ctype, mipLevels
     format = cformat
   }
   if(format !== cformat) {
-    throw new Error("Incompatible texture format for setPixels")
+    throw new Error("gl-texture2d: Incompatible texture format for setPixels")
   }
   var size = array.size
-  if(typeof size !== "number") {
-    size = ndarray.size(array)
-  }
   var needsMip = mipLevels.indexOf(mip_level) < 0
   if(needsMip) {
     mipLevels.push(mip_level)
@@ -299,6 +318,10 @@ function initTexture(gl) {
 }
 
 function createTextureShape(gl, width, height, format, type) {
+  var maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE)
+  if(width < 0 || width > maxTextureSize || height < 0 || height  > maxTextureSize) {
+    throw new Error("gl-texture2d: Invalid texture shape")
+  }
   var tex = initTexture(gl)
   gl.texImage2D(gl.TEXTURE_2D, 0, format, width, height, 0, format, type, null)
   return new Texture2D(gl, tex, width, height, format, type)
@@ -325,8 +348,13 @@ function isPacked(array) {
 
 //Creates a texture from an ndarray
 function createTextureArray(gl, array) {
-  var dtype = array.dtype || ndarray.dtype(array)
-  var shape = array.shape
+  var dtype = array.dtype
+  var shape = array.shape.slice()
+  var maxSize = gl.getParameter(gl.MAX_TEXTURE_SIZE)
+  if(shape[0] < 0 || shape[0] > maxSize || shape[1] < 0 || shape[1] > maxSize) {
+    throw new Error("gl-texture2d: Invalid texture size")
+  }
+
   var packed = isPacked(array)
   var type = 0
   if(dtype === "float32") {
@@ -340,6 +368,7 @@ function createTextureArray(gl, array) {
   } else {
     type = gl.UNSIGNED_BYTE
     packed = false
+    dtype = "uint8"
   }
   var format = 0
   if(shape.length === 2) {
@@ -381,9 +410,6 @@ function createTextureArray(gl, array) {
     buffer = buf_store.subarray(0, sz)
   } else {
     var array_size = array.size
-    if(typeof array_size !== "number") {
-      array_size = ndarray.size(array)
-    }
     buffer = array.data.subarray(array.offset, array.offset + array_size)
   }
   var tex = initTexture(gl)

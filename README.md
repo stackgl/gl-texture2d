@@ -10,44 +10,46 @@ gl-texture2d
 var shell = require("gl-now")()
 var createShader = require("gl-shader")
 var createTexture = require("gl-texture2d")
+var drawTriangle = require("a-big-triangle")
+var baboon = require("baboon-image")
+var glslify = require("glslify")
 
-var lena = require("lena")
-
-shell.on("gl-init", function() {
-  var gl = shell.gl
-  
-  var texture = createTexture(gl, lena)
-  
-  var shader = createShader(gl, "\
+var createShader = glslify({
+  vertex:"\
     attribute vec2 position;\
     varying vec2 texCoord;\
     void main() {\
       gl_Position = vec4(position, 0, 1);\
-      texCoord = vec2(0.5,-0.5) * (position + 1.0);\
-    }", "\
+      texCoord = vec2(0.0,1.0)+vec2(0.5,-0.5) * (position + 1.0);\
+    }", 
+  fragment: "\
     precision highp float;\
     uniform sampler2D texture;\
     varying vec2 texCoord;\
     void main() {\
       gl_FragColor = texture2D(texture, texCoord);\
-    }")
+    }",
+  inline: true
+})
+
+var shader, texture
+
+shell.on("gl-init", function() {
+  var gl = shell.gl
   
-  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer())
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-    -1, -1,
-     4, -1,
-    -1,  4
-  ]), gl.STATIC_DRAW)
-  
-  texture.bind(0)
-  shader.bind()
-  shader.uniforms.texture = 0
-  shader.attributes.position.pointer()
+  //Create texture
+  texture = createTexture(gl, baboon)
+
+  //Create shader
+  shader = createShader(gl)
+  shader.attributes.position.location = 0
 })
 
 shell.on("gl-render", function() {
-  var gl = shell.gl
-  gl.drawArrays(gl.TRIANGLES, 0, 3)
+  //Draw it
+  shader.bind()
+  shader.uniforms.texture = texture.bind()
+  drawTriangle(shell.gl)
 })
 ```
 
@@ -144,7 +146,14 @@ Generates mipmaps for the texture.  This will fail if the texture dimensions are
 ## Texture Properties
 
 #### `tex.shape`
-An array representing the `[height, width]` of the texture
+An array representing the `[height, width]` of the texture.  Writing to this value will resize the texture and invalidate its contents.  For example,
+
+```
+//Resize texture to shape nw,nh
+tex.shape = [nw, nh]
+```
+
+You can also access texture sizes using width/height directly, though assigning to these properties will not change the shape of the texture.
 
 #### `tex.wrapS`
 S wrap around behavior.  Used to set/get `gl.TEXTURE_WRAP_S`.  Defaults to gl.CLAMP_TO_EDGE
