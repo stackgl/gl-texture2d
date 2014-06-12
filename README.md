@@ -1,24 +1,65 @@
 gl-texture2d
 ============
-ndarray compatible wrapper for WebGLTexture objects
+[ndarray](https://github.com/mikolalysenko/ndarray) compatible wrapper for [WebGLTexture objects](http://www.khronos.org/registry/webgl/specs/latest/)
 
 # Example
+
+[Try it in your browser right now](http://mikolalysenko.github.io/gl-texture2d/)
 
 ```javascript
 var shell = require("gl-now")()
 var createShader = require("gl-shader")
 var createTexture = require("gl-texture2d")
+var drawTriangle = require("a-big-triangle")
+var baboon = require("baboon-image")
+var glslify = require("glslify")
+
+var createShader = glslify({
+  vertex:"\
+    attribute vec2 position;\
+    varying vec2 texCoord;\
+    void main() {\
+      gl_Position = vec4(position, 0, 1);\
+      texCoord = vec2(0.0,1.0)+vec2(0.5,-0.5) * (position + 1.0);\
+    }", 
+  fragment: "\
+    precision highp float;\
+    uniform sampler2D texture;\
+    varying vec2 texCoord;\
+    void main() {\
+      gl_FragColor = texture2D(texture, texCoord);\
+    }",
+  inline: true
+})
+
+var shader, texture
 
 shell.on("gl-init", function() {
+  var gl = shell.gl
+  
+  //Create texture
+  texture = createTexture(gl, baboon)
+
+  //Create shader
+  shader = createShader(gl)
+  shader.attributes.position.location = 0
 })
 
 shell.on("gl-render", function() {
+  //Draw it
+  shader.bind()
+  shader.uniforms.texture = texture.bind()
+  drawTriangle(shell.gl)
 })
 ```
 
+Here is what it should look like:
+
+<img src="https://raw.github.com/mikolalysenko/gl-texture2d/master/screenshot.png">
+
 # Install
 
-    npm install texture2d
+    npm install gl-texture2d
 
 # API
 
@@ -57,18 +98,16 @@ Then the rules for `type` and `format` are defined according to the following ta
 
 | `dtype`      | `shape`    | `format`        | `type`                 |
 | ------------ |:----------:|:---------------:|:----------------------:|
-| `float32/64` | [m,n]      | LUMINANCE       | FLOAT                  |
-| `float32/64` | [m,n,1]    | ALPHA           | FLOAT                  |
-| `float32/64` | [m,n,2]    | LUMINANCE_ALPHA | FLOAT                  |
-| `float32/64` | [m,n,3]    | RGB             | FLOAT                  |
-| `float32/64` | [m,n,4]    | RGBA            | FLOAT                  |
-| `uint8`      | [m,n]      | LUMINANCE       | UNSIGNED_BYTE          |
-| `uint8`      | [m,n,1]    | ALPHA           | UNSIGNED_BYTE          |
-| `uint8`      | [m,n,2]    | LUMINANCE_ALPHA | UNSIGNED_BYTE          |
-| `uint8`      | [m,n,3]    | RGB             | UNSIGNED_BYTE          |
-| `uint8`      | [m,n,4]    | RGBA            | UNSIGNED_BYTE          |
-| `uint16`     | [m,n]      | RGBA            | UNSIGNED_SHORT_4_4_4_4 |
-| `uint32`     | [m,n]      | RGBA            | UNSIGNED_BYTE          |
+| `float*`     | [m,n]      | LUMINANCE       | FLOAT                  |
+| `float*`     | [m,n,1]    | ALPHA           | FLOAT                  |
+| `float*`     | [m,n,2]    | LUMINANCE_ALPHA | FLOAT                  |
+| `float*`     | [m,n,3]    | RGB             | FLOAT                  |
+| `float*`     | [m,n,4]    | RGBA            | FLOAT                  |
+| `(u)int*`    | [m,n]      | LUMINANCE       | UNSIGNED_BYTE          |
+| `(u)int*`    | [m,n,1]    | ALPHA           | UNSIGNED_BYTE          |
+| `(u)int*`    | [m,n,2]    | LUMINANCE_ALPHA | UNSIGNED_BYTE          |
+| `(u)int*`    | [m,n,3]    | RGB             | UNSIGNED_BYTE          |
+| `(u)int*`    | [m,n,4]    | RGBA            | UNSIGNED_BYTE          |
 
 Other combinations of shape and dtype are invalid and throw an error.
 
@@ -81,8 +120,9 @@ Binds the texture for use.  Basically a short cut for:
 gl.activeTexture(gl.TEXTURE0 + tex_unit)
 gl.bindTexture(gl.TEXTURE_2D, this.handle)
 ```
-
 If `tex_unit` is not specified then the active texture is not changed.
+
+**Returns** The texture unit the texture is bound to.
 
 ### `tex.dispose()``
 Destroys the texture object and releases all of its resources.  Under the hood this is equivalent to:
@@ -92,34 +132,58 @@ gl.deleteTexture(this.handle)
 ```
 
 ### `tex.setPixels(data[, x_off, y_off, mip_level])`
-Unpacks `data` into a subregion of the texture.  As before in the constructor `data` can be either an `ndarray`, `HTMLCanvas`, `HTMLImage` or `HTMLVideo` object.
+Unpacks `data` into a subregion of the texture.  As before in the constructor `data` can be either an `ndarray`, `HTMLCanvas`, `HTMLImage` or `HTMLVideo` object.  If `data` is an ndarray it must have a compatible format with the initial array layout.
 
 * `x_off` is the x offset to write from. (default `0`)
 * `y_off` is the y offset to write from. (default `0`)
 * `mip_level` is the mip level to write to. (default `0`)
 
-### `tex.generateMipmaps()`
-Generates mipmaps for the texture.
+If `data` is an `ndarray` the same rules as in the constructor are followed for converting the type of the buffer.
+
+### `tex.generateMipmap()`
+Generates mipmaps for the texture.  This will fail if the texture dimensions are not a power of two.
 
 ## Texture Properties
 
-### `tex.handle`
-A handles to the underlying texture object.
+#### `tex.shape`
+An array representing the `[height, width]` of the texture.  Writing to this value will resize the texture and invalidate its contents.  For example,
 
-### `tex.shape`
-An array representing the `[height, width]` of the texture
+```
+//Resize texture to shape nw,nh
+tex.shape = [nw, nh]
+```
 
-### `tex.wrapS`
-S wrap around behavior
+You can also access texture sizes using width/height directly, though assigning to these properties will not change the shape of the texture.
 
-### `tex.wrapT`
-T wrap around behavior
+#### `tex.wrapS`
+S wrap around behavior.  Used to set/get `gl.TEXTURE_WRAP_S`.  Defaults to gl.CLAMP_TO_EDGE
 
-### `tex.magFilter`
-Magnification filter
+#### `tex.wrapT`
+T wrap around behavior.  Used to set/get `gl.TEXTURE_WRAP_T`. Defaults to gl.CLAMP_TO_EDGE
 
-### `tex.minFilter`
-Minification filter
+#### `tex.magFilter`
+Magnification filter.  Used to set/get `gl.TEXTURE_MAG_FILTER`. Defaults to gl.NEAREST
+
+#### `tex.minFilter`
+Minification filter. Used to set/get `gl.TEXTURE_MIN_FILTER`. Defaults to gl.NEAREST
+
+#### `tex.mipSamples`
+The number of anisotropic filtering samples to use.  This requires `EXT_texture_filter_anisotropic` to have any effect.  High values will improve mipmap quality, but decrease performance.
+
+## Internals
+
+#### `tex.gl`
+A reference to the WebGL context of the texture.
+
+#### `tex.handle`
+A handle to the underlying texture object.
+
+#### `tex.format`
+The internal format of the texture.
+
+#### `tex.type`
+The internal data type of the texture.
+
 
 # Credits
 (c) 2013 Mikola Lysenko. MIT License
