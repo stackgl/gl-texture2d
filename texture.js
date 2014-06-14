@@ -119,6 +119,35 @@ Object.defineProperty(proto, "wrapT", {
   }
 })
 
+
+Object.defineProperty(proto, "wrap", {
+  get: function() {
+    return [this._wrapT, this._wrapS]
+  },
+  set: function(v) {
+    if(!Array.isArray(v)) {
+      v = [v,v]
+    }
+    if(v.length !== 2) {
+      throw new Error("gl-texture2d: Must specify wrap mode for rows and columns")
+    }
+    for(var i=0; i<2; ++i) {
+      if(wrapTypes.indexOf(v[i]) < 0) {
+        throw new Error("gl-texture2d: Unknown wrap mode " + v)
+      }
+    }
+    this._wrapT = v[0]
+    this._wrapS = v[1]
+
+    var gl = this.gl
+    this.bind()
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, this._wrapT)
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, this._wrapS)
+
+    return v
+  }
+})
+
 Object.defineProperty(proto, "mipSamples", {
   get: function() {
     return this._anisoSamples
@@ -141,17 +170,26 @@ Object.defineProperty(proto, "shape", {
     return this._shape
   }, 
   set: function(x) {
-    if(this.height === x[0] && this.width === x[1]) {
+    if(!Array.isArray(x)) {
+      x = [x|0,x|0]
+    } else {
+      if(x.length !== 2) {
+        throw new Error("gl-texture2d: Invalid texture shape")
+      }
+    }
+    var r = x[0]|0
+    var c = x[1]|0
+    if(this.height === r && this.width === c) {
       return x
     }
     var gl = this.gl
     var maxSize = gl.getParameter(gl.MAX_TEXTURE_SIZE)
-    if(x[0] < 0 || x[0] > maxSize || x[1] < 0 || x[1] > maxSize) {
+    if(c < 0 || c > maxSize || r < 0 || r > maxSize) {
       throw new Error("gl-texture2d: Invalid texture size")
     }
-    this._shape = [x[0], x[1]]
+    this._shape = [r, c]
     this.bind()
-    gl.texImage2D(gl.TEXTURE_2D, 0, this.format, x[1], x[0], 0, this.format, this.type, null)
+    gl.texImage2D(gl.TEXTURE_2D, 0, this.format, c, r, 0, this.format, this.type, null)
     this._mipLevels = [0]
     return x
   }
@@ -189,8 +227,14 @@ proto.generateMipmap = function() {
 proto.setPixels = function(data, x_off, y_off, mip_level) {
   var gl = this.gl
   this.bind()
-  x_off = x_off || 0
-  y_off = y_off || 0
+  if(Array.isArray(x_off)) {
+    mip_level = y_off
+    y_off = x_off[0]|0
+    x_off = x_off[1]|0
+  } else {
+    x_off = x_off || 0
+    y_off = y_off || 0
+  }
   mip_level = mip_level || 0
   if(data instanceof HTMLCanvasElement ||
      data instanceof ImageData ||

@@ -130,12 +130,11 @@ Destroys the texture object and releases all of its resources.  Under the hood t
 gl.deleteTexture(this.handle)
 ```
 
-### `tex.setPixels(data[, x_off, y_off, mip_level])`
+### `tex.setPixels(data[, offset, mipLevel])`
 Unpacks `data` into a subregion of the texture.  As before in the constructor `data` can be either an `ndarray`, `HTMLCanvas`, `HTMLImage` or `HTMLVideo` object.  If `data` is an ndarray it must have a compatible format with the initial array layout.
 
-* `x_off` is the x offset to write from. (default `0`)
-* `y_off` is the y offset to write from. (default `0`)
-* `mip_level` is the mip level to write to. (default `0`)
+* `offset` is a length 2 array representing the offset into which the pixels will be written in `[rows,columns]`.  (Default: `[0,0]`)
+* `mipLevel` is the mip level to write to. (Default `0`)
 
 If `data` is an `ndarray` the same rules as in the constructor are followed for converting the type of the buffer.
 
@@ -145,24 +144,30 @@ Generates mipmaps for the texture.  This will fail if the texture dimensions are
 ## Texture Properties
 
 #### `tex.shape`
-An array representing the `[height, width]` of the texture.  Writing to this value will resize the texture and invalidate its contents.  For example,
+An array representing the dimensions of the texture in `[rows, columns]`.  Writing to this value will resize the texture and invalidate its contents.  For example, to resize the texture `tex` to the shape `[newRows, newColumns]` you can do:
 
+```javascript
+tex.shape = [newRows, newColumns]
 ```
-//Resize texture to shape nw,nh
-tex.shape = [nw, nh]
+
+#### `tex.wrap`
+Texture wrap around behavior for rows/columns of the texture.  Used to set/get `[gl.TEXTURE_WRAP_T, gl.TEXTURE_WRAP_S]`.  Defaults to `[gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE]`.  To update this value, write to it with a vector. For example,
+
+```javascript
+tex.wrap = [gl.MIRRORED_REPEAT, gl.REPEAT]
 ```
 
-#### `tex.wrapS`
-S wrap around behavior.  Used to set/get `gl.TEXTURE_WRAP_S`.  Defaults to gl.CLAMP_TO_EDGE
+Or you can update it with a single value to set the wrap mode for both axes:
 
-#### `tex.wrapT`
-T wrap around behavior.  Used to set/get `gl.TEXTURE_WRAP_T`. Defaults to gl.CLAMP_TO_EDGE
+```javascript
+tex.wrap = gl.REPEAT
+```
 
 #### `tex.magFilter`
-Magnification filter.  Used to set/get `gl.TEXTURE_MAG_FILTER`. Defaults to gl.NEAREST
+Magnification filter.  Used to set/get `gl.TEXTURE_MAG_FILTER`. Defaults to `gl.NEAREST`
 
 #### `tex.minFilter`
-Minification filter. Used to set/get `gl.TEXTURE_MIN_FILTER`. Defaults to gl.NEAREST
+Minification filter. Used to set/get `gl.TEXTURE_MIN_FILTER`. Defaults to `gl.NEAREST`
 
 #### `tex.mipSamples`
 The number of anisotropic filtering samples to use.  This requires `EXT_texture_filter_anisotropic` to have any effect.  High values will improve mipmap quality, but decrease performance.
