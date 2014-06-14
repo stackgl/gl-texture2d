@@ -77,8 +77,8 @@ Creates an unitialized texture with the given dimensions and format
 * `format` (optional) is the format of the texture (default `gl.RGBA`)
 * `type` is the type of texture (default `gl.UNSIGNED_BYTE`)
 
-### `var tex = createTexture(gl, dom_element[, format, type])`
-Creates a texture from the given data source.  Where `dom_element` is one of the following items:
+### `var tex = createTexture(gl, domElement[, format, type])`
+Creates a texture from the given data source.  Where `domElement` is one of the following items:
 
 * An `ImageData` object
 * An `HTMLCanvas` object
@@ -112,14 +112,14 @@ Other combinations of shape and dtype are invalid and throw an error.
 
 ## Texture Methods
 
-### `tex.bind([tex_unit])`
+### `tex.bind([texUnit])`
 Binds the texture for use.  Basically a short cut for:
 
 ```javascript
-gl.activeTexture(gl.TEXTURE0 + tex_unit)
+gl.activeTexture(gl.TEXTURE0 + texUnit)
 gl.bindTexture(gl.TEXTURE_2D, this.handle)
 ```
-If `tex_unit` is not specified then the active texture is not changed.
+If `texUnit` is not specified then the active texture is not changed.
 
 **Returns** The texture unit the texture is bound to.
 
