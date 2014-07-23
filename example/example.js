@@ -29,7 +29,7 @@ shell.on("gl-init", function() {
   var gl = shell.gl
   
   //Create texture
-  texture = createTexture(gl, baboon)
+  texture = createTexture(gl, baboon.transpose(1,0))
   
   //Create shader
   shader = createShader(gl)

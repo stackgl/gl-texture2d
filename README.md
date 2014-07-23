@@ -7,12 +7,12 @@ WebGL texture object wrapper
 [Try it in your browser right now](http://gl-modules.github.io/gl-texture2d/)
 
 ```javascript
-var shell = require("gl-now")()
-var createShader = require("gl-shader")
+var shell         = require("gl-now")()
+var createShader  = require("gl-shader")
 var createTexture = require("gl-texture2d")
-var drawTriangle = require("a-big-triangle")
-var baboon = require("baboon-image")
-var glslify = require("glslify")
+var drawTriangle  = require("a-big-triangle")
+var baboon        = require("baboon-image")
+var glslify       = require("glslify")
 
 var createShader = glslify({
   vertex:"\
@@ -73,7 +73,7 @@ There are three basic usage patterns for `createTexture`:
 ### `var tex = createTexture(gl, shape[, format, type])`
 Creates an unitialized texture with the given dimensions and format
 
-* `shape` is a length 2 array representing the `[rows, columns]` of the texture
+* `shape` is a length 2 array representing the `[width, height]` of the texture
 * `format` (optional) is the format of the texture (default `gl.RGBA`)
 * `type` is the type of texture (default `gl.UNSIGNED_BYTE`)
 
@@ -97,16 +97,16 @@ Then the rules for `type` and `format` are defined according to the following ta
 
 | `dtype`      | `shape`    | `format`        | `type`                 |
 | ------------ |:----------:|:---------------:|:----------------------:|
-| `float*`     | [m,n]      | LUMINANCE       | FLOAT                  |
-| `float*`     | [m,n,1]    | ALPHA           | FLOAT                  |
-| `float*`     | [m,n,2]    | LUMINANCE_ALPHA | FLOAT                  |
-| `float*`     | [m,n,3]    | RGB             | FLOAT                  |
-| `float*`     | [m,n,4]    | RGBA            | FLOAT                  |
-| `(u)int*`    | [m,n]      | LUMINANCE       | UNSIGNED_BYTE          |
-| `(u)int*`    | [m,n,1]    | ALPHA           | UNSIGNED_BYTE          |
-| `(u)int*`    | [m,n,2]    | LUMINANCE_ALPHA | UNSIGNED_BYTE          |
-| `(u)int*`    | [m,n,3]    | RGB             | UNSIGNED_BYTE          |
-| `(u)int*`    | [m,n,4]    | RGBA            | UNSIGNED_BYTE          |
+| `float*`     | [w,h]      | LUMINANCE       | FLOAT                  |
+| `float*`     | [w,h,1]    | ALPHA           | FLOAT                  |
+| `float*`     | [w,h,2]    | LUMINANCE_ALPHA | FLOAT                  |
+| `float*`     | [w,h,3]    | RGB             | FLOAT                  |
+| `float*`     | [w,h,4]    | RGBA            | FLOAT                  |
+| `(u)int*`    | [w,h]      | LUMINANCE       | UNSIGNED_BYTE          |
+| `(u)int*`    | [w,h,1]    | ALPHA           | UNSIGNED_BYTE          |
+| `(u)int*`    | [w,h,2]    | LUMINANCE_ALPHA | UNSIGNED_BYTE          |
+| `(u)int*`    | [w,h,3]    | RGB             | UNSIGNED_BYTE          |
+| `(u)int*`    | [w,h,4]    | RGBA            | UNSIGNED_BYTE          |
 
 Other combinations of shape and dtype are invalid and throw an error.
 
@@ -133,7 +133,7 @@ gl.deleteTexture(this.handle)
 ### `tex.setPixels(data[, offset, mipLevel])`
 Unpacks `data` into a subregion of the texture.  As before in the constructor `data` can be either an `ndarray`, `HTMLCanvas`, `HTMLImage` or `HTMLVideo` object.  If `data` is an ndarray it must have a compatible format with the initial array layout.
 
-* `offset` is a length 2 array representing the offset into which the pixels will be written in `[rows,columns]`.  (Default: `[0,0]`)
+* `offset` is a length 2 array representing the offset into which the pixels will be written in `[x,y]`.  (Default: `[0,0]`)
 * `mipLevel` is the mip level to write to. (Default `0`)
 
 If `data` is an `ndarray` the same rules as in the constructor are followed for converting the type of the buffer.
@@ -144,10 +144,10 @@ Generates mipmaps for the texture.  This will fail if the texture dimensions are
 ## Texture Properties
 
 #### `tex.shape`
-An array representing the dimensions of the texture in `[rows, columns]`.  Writing to this value will resize the texture and invalidate its contents.  For example, to resize the texture `tex` to the shape `[newRows, newColumns]` you can do:
+An array representing the dimensions of the texture in `[rows, columns]`.  Writing to this value will resize the texture and invalidate its contents.  For example, to resize the texture `tex` to the shape `[newWidth, newHeight]` you can do:
 
 ```javascript
-tex.shape = [newRows, newColumns]
+tex.shape = [newWidth, newHeight]
 ```
 
 #### `tex.wrap`
@@ -186,6 +186,5 @@ The internal format of the texture.
 #### `tex.type`
 The internal data type of the texture.
 
-
 # Credits
-(c) 2013 Mikola Lysenko. MIT License
+(c) 2013-2014 Mikola Lysenko. MIT License
