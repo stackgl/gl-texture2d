@@ -144,14 +144,14 @@ Generates mipmaps for the texture.  This will fail if the texture dimensions are
 ## Texture Properties
 
 #### `tex.shape`
-An array representing the dimensions of the texture in `[rows, columns]`.  Writing to this value will resize the texture and invalidate its contents.  For example, to resize the texture `tex` to the shape `[newWidth, newHeight]` you can do:
+An array representing the dimensions of the texture in `[width, height]`.  Writing to this value will resize the texture and invalidate its contents.  For example, to resize the texture `tex` to the shape `[newWidth, newHeight]` you can do:
 
 ```javascript
 tex.shape = [newWidth, newHeight]
 ```
 
 #### `tex.wrap`
-Texture wrap around behavior for rows/columns of the texture.  Used to set/get `[gl.TEXTURE_WRAP_T, gl.TEXTURE_WRAP_S]`.  Defaults to `[gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE]`.  To update this value, write to it with a vector. For example,
+Texture wrap around behavior for x/y of the texture.  Used to set/get `[gl.TEXTURE_WRAP_T, gl.TEXTURE_WRAP_S]`.  Defaults to `[gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE]`.  To update this value, write to it with a vector. For example,
 
 ```javascript
 tex.wrap = [gl.MIRRORED_REPEAT, gl.REPEAT]
