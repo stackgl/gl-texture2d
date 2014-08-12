@@ -496,7 +496,7 @@ function createTextureArray(gl, array) {
   } else {
     throw new Error("Invalid shape for texture")
   }
-  if(type === gl.FLOAT && !!webglew(gl).texture_float) {
+  if(type === gl.FLOAT && !webglew(gl).texture_float) {
     type = gl.UNSIGNED_BYTE
     packed = false
   }
