@@ -1,9 +1,9 @@
-"use strict"
+'use strict'
 
-var ndarray = require("ndarray")
-var ops     = require("ndarray-ops")
-var pool    = require("typedarray-pool")
-var webglew = require("webglew")
+var ndarray = require('ndarray')
+var ops     = require('ndarray-ops')
+var pool    = require('typedarray-pool')
+var webglew = require('webglew')
 
 module.exports = createTexture2D
 
@@ -309,8 +309,8 @@ proto.setPixels = function(data, x_off, y_off, mip_level) {
     }
   } else if(data.shape && data.stride && data.data) {
     if(data.shape.length < 2 ||
-       x_off + data.shape[0] > this._shape[0]>>>mip_level ||
-       y_off + data.shape[1] > this._shape[1]>>>mip_level ||
+       x_off + data.shape[1] > this._shape[0]>>>mip_level ||
+       y_off + data.shape[0] > this._shape[1]>>>mip_level ||
        x_off < 0 ||
        y_off < 0) {
       throw new Error("gl-texture2d: Texture dimensions are out of bounds")
@@ -357,6 +357,7 @@ function texSubImageArray(gl, x_off, y_off, mip_level, cformat, ctype, mipLevels
   if(shape.length === 2) {
     format = gl.LUMINANCE
     shape = [shape[0], shape[1], 1]
+    array = ndarray(array.data, shape, [array.stride[0], array.stride[1], 1], array.offset)
   } else if(shape.length === 3) {
     if(shape[2] === 1) {
       format = gl.ALPHA
@@ -481,6 +482,7 @@ function createTextureArray(gl, array) {
   if(shape.length === 2) {
     format = gl.LUMINANCE
     shape = [shape[0], shape[1], 1]
+    array = ndarray(array.data, shape, [array.stride[0], array.stride[1], 1], array.offset)
   } else if(shape.length === 3) {
     if(shape[2] === 1) {
       format = gl.ALPHA
@@ -518,7 +520,7 @@ function createTextureArray(gl, array) {
     buffer = array.data.subarray(array.offset, array.offset + size)
   }
   var tex = initTexture(gl)
-  gl.texImage2D(gl.TEXTURE_2D, 0, format, shape[1], shape[0], 0, format, type, buffer)
+  gl.texImage2D(gl.TEXTURE_2D, 0, format, shape[0], shape[1], 0, format, type, buffer)
   if(!packed) {
     pool.free(buf_store)
   }
