@@ -309,8 +309,8 @@ proto.setPixels = function(data, x_off, y_off, mip_level) {
     }
   } else if(data.shape && data.stride && data.data) {
     if(data.shape.length < 2 ||
-       x_off + data.shape[1] > this._shape[0]>>>mip_level ||
-       y_off + data.shape[0] > this._shape[1]>>>mip_level ||
+       x_off + data.shape[1] > this._shape[1]>>>mip_level ||
+       y_off + data.shape[0] > this._shape[0]>>>mip_level ||
        x_off < 0 ||
        y_off < 0) {
       throw new Error("gl-texture2d: Texture dimensions are out of bounds")
