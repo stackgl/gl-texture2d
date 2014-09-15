@@ -4,6 +4,7 @@ var createTexture = require("../texture.js")
 var drawTriangle = require("a-big-triangle")
 var baboon = require("baboon-image")
 var glslify = require("glslify")
+var ndarray = require("ndarray")
 
 var createShader = glslify({
   vertex:"\
@@ -28,15 +29,16 @@ var shader, texture
 shell.on("gl-init", function() {
   var gl = shell.gl
   
-  //Create texture
-  texture = createTexture(gl, baboon.transpose(1,0))
-  
   //Create shader
   shader = createShader(gl)
   shader.attributes.position.location = 0
+
+  //Create texture
+  texture = createTexture(gl, baboon.transpose(1,0))
 })
 
 shell.on("gl-render", function() {
+  console.log('foo')
   shader.bind()
   shader.uniforms.texture = texture.bind()
   drawTriangle(shell.gl)

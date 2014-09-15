@@ -41,7 +41,7 @@ function reshapeTexture(tex, w, h) {
   var gl = tex.gl
   var maxSize = gl.getParameter(gl.MAX_TEXTURE_SIZE)
   if(w < 0 || w > maxSize || h < 0 || h > maxSize) {
-    throw new Error("gl-texture2d: Invalid texture size")
+    throw new Error('gl-texture2d: Invalid texture size')
   }
   tex._shape = [w, h]
   tex.bind()
@@ -65,8 +65,8 @@ function Texture2D(gl, handle, width, height, format, type) {
 
   var parent = this
   var wrapVector = [this._wrapS, this._wrapT]
-  Object.defineProperties(wrapVector, {
-    "0": {
+  Object.defineProperties(wrapVector, [
+    {
       get: function() {
         return parent._wrapS
       },
@@ -74,7 +74,7 @@ function Texture2D(gl, handle, width, height, format, type) {
         return parent.wrapS = v
       }
     },
-    "1": {
+    {
       get: function() {
         return parent._wrapT
       },
@@ -82,12 +82,12 @@ function Texture2D(gl, handle, width, height, format, type) {
         return parent.wrapT = v
       }
     }
-  })
+  ])
   this._wrapVector = wrapVector
 
   var shapeVector = [this._shape[0], this._shape[1]]
-  Object.defineProperties(shapeVector, {
-    "0": {
+  Object.defineProperties(shapeVector, [
+    {
       get: function() {
         return parent._shape[0]
       },
@@ -95,7 +95,7 @@ function Texture2D(gl, handle, width, height, format, type) {
         return parent.width = v
       }
     },
-    "1" : {
+    {
       get: function() {
         return parent._shape[1]
       },
@@ -103,14 +103,14 @@ function Texture2D(gl, handle, width, height, format, type) {
         return parent.height = v
       }
     }
-  })
+  ])
   this._shapeVector = shapeVector
 }
 
 var proto = Texture2D.prototype
 
 Object.defineProperties(proto, {
-  "minFilter": {
+  minFilter: {
     get: function() {
       return this._minFilter
     },
@@ -123,13 +123,13 @@ Object.defineProperties(proto, {
         }
       }
       if(filterTypes.indexOf(v) < 0) {
-        throw new Error("gl-texture2d: Unknown filter mode " + v)
+        throw new Error('gl-texture2d: Unknown filter mode ' + v)
       }
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, v)
       return this._minFilter = v
     }
   },
-  "magFilter": {
+  magFilter: {
     get: function() {
       return this._magFilter
     },
@@ -142,13 +142,13 @@ Object.defineProperties(proto, {
         }
       }
       if(filterTypes.indexOf(v) < 0) {
-        throw new Error("gl-texture2d: Unknown filter mode " + v)
+        throw new Error('gl-texture2d: Unknown filter mode ' + v)
       }
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, v)
       return this._magFilter = v
     }
   },
-  "mipSamples": {
+  mipSamples: {
     get: function() {
       return this._anisoSamples
     },
@@ -164,33 +164,33 @@ Object.defineProperties(proto, {
       return this._anisoSamples
     }
   },
-  "wrapS": {
+  wrapS: {
     get: function() {
       return this._wrapS
     },
     set: function(v) {
       this.bind()
       if(wrapTypes.indexOf(v) < 0) {
-        throw new Error("gl-texture2d: Unknown wrap mode " + v)
+        throw new Error('gl-texture2d: Unknown wrap mode ' + v)
       }
       this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, v)
       return this._wrapS = v
     }
   },
-  "wrapT": {
+  wrapT: {
     get: function() {
       return this._wrapT
     },
     set: function(v) {
       this.bind()
       if(wrapTypes.indexOf(v) < 0) {
-        throw new Error("gl-texture2d: Unknown wrap mode " + v)
+        throw new Error('gl-texture2d: Unknown wrap mode ' + v)
       }
       this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, v)
       return this._wrapT = v
     }
   },
-  "wrap": {
+  wrap: {
     get: function() {
       return this._wrapVector
     },
@@ -199,11 +199,11 @@ Object.defineProperties(proto, {
         v = [v,v]
       }
       if(v.length !== 2) {
-        throw new Error("gl-texture2d: Must specify wrap mode for rows and columns")
+        throw new Error('gl-texture2d: Must specify wrap mode for rows and columns')
       }
       for(var i=0; i<2; ++i) {
         if(wrapTypes.indexOf(v[i]) < 0) {
-          throw new Error("gl-texture2d: Unknown wrap mode " + v)
+          throw new Error('gl-texture2d: Unknown wrap mode ' + v)
         }
       }
       this._wrapS = v[0]
@@ -217,7 +217,7 @@ Object.defineProperties(proto, {
       return v
     }
   },
-  "shape": {
+  shape: {
     get: function() {
       return this._shapeVector
     }, 
@@ -226,14 +226,14 @@ Object.defineProperties(proto, {
         x = [x|0,x|0]
       } else {
         if(x.length !== 2) {
-          throw new Error("gl-texture2d: Invalid texture shape")
+          throw new Error('gl-texture2d: Invalid texture shape')
         }
       }
       reshapeTexture(this, x[0]|0, x[1]|0)
       return [x[0]|0, x[1]|0]
     }
   },
-  "width": {
+  width: {
     get: function() {
       return this._shape[0]
     },
@@ -243,7 +243,7 @@ Object.defineProperties(proto, {
       return w
     }
   },
-  "height": {
+  height: {
     get: function() {
       return this._shape[1]
     },
@@ -262,7 +262,7 @@ proto.bind = function(unit) {
   }
   gl.bindTexture(gl.TEXTURE_2D, this.handle)
   if(unit !== undefined) {
-    return unit
+    return (unit|0)
   }
   return gl.getParameter(gl.ACTIVE_TEXTURE) - gl.TEXTURE0
 }
@@ -313,11 +313,11 @@ proto.setPixels = function(data, x_off, y_off, mip_level) {
        y_off + data.shape[0] > this._shape[0]>>>mip_level ||
        x_off < 0 ||
        y_off < 0) {
-      throw new Error("gl-texture2d: Texture dimensions are out of bounds")
+      throw new Error('gl-texture2d: Texture dimensions are out of bounds')
     }
     texSubImageArray(gl, x_off, y_off, mip_level, this.format, this.type, this._mipLevels, data)
   } else {
-    throw new Error("gl-texture2d: Unsupported data type")
+    throw new Error('gl-texture2d: Unsupported data type')
   }
 }
 
@@ -336,22 +336,22 @@ function texSubImageArray(gl, x_off, y_off, mip_level, cformat, ctype, mipLevels
   var dtype = array.dtype
   var shape = array.shape.slice()
   if(shape.length < 2 || shape.length > 3) {
-    throw new Error("gl-texture2d: Invalid ndarray, must be 2d or 3d")
+    throw new Error('gl-texture2d: Invalid ndarray, must be 2d or 3d')
   }
   var type = 0, format = 0
   var packed = isPacked(shape, array.stride.slice())
-  if(dtype === "float32") {
+  if(dtype === 'float32') {
     type = gl.FLOAT
-  } else if(dtype === "float64") {
+  } else if(dtype === 'float64') {
     type = gl.FLOAT
     packed = false
-    dtype = "float32"
-  } else if(dtype === "uint8") {
+    dtype = 'float32'
+  } else if(dtype === 'uint8') {
     type = gl.UNSIGNED_BYTE
   } else {
     type = gl.UNSIGNED_BYTE
     packed = false
-    dtype = "uint8"
+    dtype = 'uint8'
   }
   var channels = 1
   if(shape.length === 2) {
@@ -368,11 +368,11 @@ function texSubImageArray(gl, x_off, y_off, mip_level, cformat, ctype, mipLevels
     } else if(shape[2] === 4) {
       format = gl.RGBA
     } else {
-      throw new Error("gl-texture2d: Invalid shape for pixel coords")
+      throw new Error('gl-texture2d: Invalid shape for pixel coords')
     }
     channels = shape[2]
   } else {
-    throw new Error("gl-texture2d: Invalid shape for texture")
+    throw new Error('gl-texture2d: Invalid shape for texture')
   }
   //For 1-channel textures allow conversion between formats
   if((format  === gl.LUMINANCE || format  === gl.ALPHA) &&
@@ -380,7 +380,7 @@ function texSubImageArray(gl, x_off, y_off, mip_level, cformat, ctype, mipLevels
     format = cformat
   }
   if(format !== cformat) {
-    throw new Error("gl-texture2d: Incompatible texture format for setPixels")
+    throw new Error('gl-texture2d: Incompatible texture format for setPixels')
   }
   var size = array.size
   var needsMip = mipLevels.indexOf(mip_level) < 0
@@ -442,7 +442,7 @@ function initTexture(gl) {
 function createTextureShape(gl, width, height, format, type) {
   var maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE)
   if(width < 0 || width > maxTextureSize || height < 0 || height  > maxTextureSize) {
-    throw new Error("gl-texture2d: Invalid texture shape")
+    throw new Error('gl-texture2d: Invalid texture shape')
   }
   var tex = initTexture(gl)
   gl.texImage2D(gl.TEXTURE_2D, 0, format, width, height, 0, format, type, null)
@@ -461,22 +461,22 @@ function createTextureArray(gl, array) {
   var shape = array.shape.slice()
   var maxSize = gl.getParameter(gl.MAX_TEXTURE_SIZE)
   if(shape[0] < 0 || shape[0] > maxSize || shape[1] < 0 || shape[1] > maxSize) {
-    throw new Error("gl-texture2d: Invalid texture size")
+    throw new Error('gl-texture2d: Invalid texture size')
   }
   var packed = isPacked(shape, array.stride.slice())
   var type = 0
-  if(dtype === "float32") {
+  if(dtype === 'float32') {
     type = gl.FLOAT
-  } else if(dtype === "float64") {
+  } else if(dtype === 'float64') {
     type = gl.FLOAT
     packed = false
-    dtype = "float32"
-  } else if(dtype === "uint8") {
+    dtype = 'float32'
+  } else if(dtype === 'uint8') {
     type = gl.UNSIGNED_BYTE
   } else {
     type = gl.UNSIGNED_BYTE
     packed = false
-    dtype = "uint8"
+    dtype = 'uint8'
   }
   var format = 0
   if(shape.length === 2) {
@@ -493,10 +493,10 @@ function createTextureArray(gl, array) {
     } else if(shape[2] === 4) {
       format = gl.RGBA
     } else {
-      throw new Error("Invalid shape for pixel coords")
+      throw new Error('gl-texture2d: Invalid shape for pixel coords')
     }
   } else {
-    throw new Error("Invalid shape for texture")
+    throw new Error('gl-texture2d: Invalid shape for texture')
   }
   if(type === gl.FLOAT && !webglew(gl).texture_float) {
     type = gl.UNSIGNED_BYTE
@@ -508,7 +508,7 @@ function createTextureArray(gl, array) {
     var stride = [shape[2], shape[2]*shape[0], 1]
     buf_store = pool.malloc(size, dtype)
     var buf_array = ndarray(buf_store, shape, stride, 0)
-    if((dtype === "float32" || dtype === "float64") && type === gl.UNSIGNED_BYTE) {
+    if((dtype === 'float32' || dtype === 'float64') && type === gl.UNSIGNED_BYTE) {
       convertFloatToUint8(buf_array, array)
     } else {
       ops.assign(buf_array, array)
@@ -529,18 +529,18 @@ function createTextureArray(gl, array) {
 
 function createTexture2D(gl) {
   if(arguments.length <= 1) {
-    throw new Error("Missing arguments for texture2d constructor")
+    throw new Error('gl-texture2d: Missing arguments for texture2d constructor')
   }
   if(!linearTypes) {
     lazyInitLinearTypes(gl)
   }
-  if(typeof arguments[1] === "number") {
+  if(typeof arguments[1] === 'number') {
     return createTextureShape(gl, arguments[1], arguments[2], arguments[3]||gl.RGBA, arguments[4]||gl.UNSIGNED_BYTE)
   }
   if(Array.isArray(arguments[1])) {
     return createTextureShape(gl, arguments[1][0]|0, arguments[1][1]|0, arguments[2]||gl.RGBA, arguments[4]||gl.UNSIGNED_BYTE)
   }
-  if(typeof arguments[1] === "object") {
+  if(typeof arguments[1] === 'object') {
     var obj = arguments[1]
     if(obj instanceof HTMLCanvasElement ||
        obj instanceof HTMLImageElement ||
@@ -551,5 +551,5 @@ function createTexture2D(gl) {
       return createTextureArray(gl, obj)
     }
   }
-  throw new Error("Invalid arguments for texture2d constructor")
+  throw new Error('gl-texture2d: Invalid arguments for texture2d constructor')
 }
