@@ -541,7 +541,7 @@ function createTexture2D(gl) {
     return createTextureShape(gl, arguments[1], arguments[2], arguments[3]||gl.RGBA, arguments[4]||gl.UNSIGNED_BYTE)
   }
   if(Array.isArray(arguments[1])) {
-    return createTextureShape(gl, arguments[1][0]|0, arguments[1][1]|0, arguments[2]||gl.RGBA, arguments[4]||gl.UNSIGNED_BYTE)
+    return createTextureShape(gl, arguments[1][0]|0, arguments[1][1]|0, arguments[2]||gl.RGBA, arguments[3]||gl.UNSIGNED_BYTE)
   }
   if(typeof arguments[1] === 'object') {
     var obj = arguments[1]
