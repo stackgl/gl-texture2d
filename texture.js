@@ -527,7 +527,7 @@ function createTextureArray(gl, array) {
   if(!packed) {
     pool.free(buf_store)
   }
-  return new Texture2D(gl, tex, shape[1], shape[0], format, type)
+  return new Texture2D(gl, tex, shape[0], shape[1], format, type)
 }
 
 function createTexture2D(gl) {
