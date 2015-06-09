@@ -3,7 +3,6 @@
 var ndarray = require('ndarray')
 var ops     = require('ndarray-ops')
 var pool    = require('typedarray-pool')
-var webglew = require('webglew')
 
 module.exports = createTexture2D
 
@@ -118,7 +117,7 @@ Object.defineProperties(proto, {
       this.bind()
       var gl = this.gl
       if(this.type === gl.FLOAT && linearTypes.indexOf(v) >= 0) {
-        if(!webglew(gl).texture_float_linear) {
+        if(!gl.getExtension('OES_texture_float_linear')) {
           v = gl.NEAREST
         }
       }
@@ -137,7 +136,7 @@ Object.defineProperties(proto, {
       this.bind()
       var gl = this.gl
       if(this.type === gl.FLOAT && linearTypes.indexOf(v) >= 0) {
-        if(!webglew(gl).texture_float_linear) {
+        if(!gl.getExtension('OES_texture_float_linear')) {
           v = gl.NEAREST
         }
       }
@@ -156,7 +155,7 @@ Object.defineProperties(proto, {
       var psamples = this._anisoSamples
       this._anisoSamples = Math.max(i, 1)|0
       if(psamples !== this._anisoSamples) {
-        var ext = webglew(this.gl).EXT_texture_filter_anisotropic
+        var ext = gl.getExtension('EXT_texture_filter_anisotropic')
         if(ext) {
           this.gl.texParameterf(this.gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, this._anisoSamples)
         }
@@ -220,7 +219,7 @@ Object.defineProperties(proto, {
   shape: {
     get: function() {
       return this._shapeVector
-    }, 
+    },
     set: function(x) {
       if(!Array.isArray(x)) {
         x = [x|0,x|0]
@@ -274,7 +273,7 @@ proto.dispose = function() {
 proto.generateMipmap = function() {
   this.bind()
   this.gl.generateMipmap(this.gl.TEXTURE_2D)
-  
+
   //Update mip levels
   var l = Math.min(this._shape[0], this._shape[1])
   for(var i=0; l>0; ++i, l>>>=1) {
@@ -324,11 +323,11 @@ proto.setPixels = function(data, x_off, y_off, mip_level) {
 
 function isPacked(shape, stride) {
   if(shape.length === 3) {
-    return  (stride[2] === 1) && 
+    return  (stride[2] === 1) &&
             (stride[1] === shape[0]*shape[2]) &&
             (stride[0] === shape[2])
   }
-  return  (stride[0] === 1) && 
+  return  (stride[0] === 1) &&
           (stride[1] === shape[0])
 }
 
@@ -444,7 +443,7 @@ function createTextureShape(gl, width, height, format, type) {
   if(width < 0 || width > maxTextureSize || height < 0 || height  > maxTextureSize) {
     throw new Error('gl-texture2d: Invalid texture shape')
   }
-  if(type === gl.FLOAT && !webglew(gl).texture_float) {
+  if(type === gl.FLOAT && !gl.getExtension('OES_texture_float')) {
     throw new Error('gl-texture2d: Floating point textures not supported on this platform')
   }
   var tex = initTexture(gl)
@@ -501,7 +500,7 @@ function createTextureArray(gl, array) {
   } else {
     throw new Error('gl-texture2d: Invalid shape for texture')
   }
-  if(type === gl.FLOAT && !webglew(gl).texture_float) {
+  if(type === gl.FLOAT && !gl.getExtension('OES_texture_float')) {
     type = gl.UNSIGNED_BYTE
     packed = false
   }
