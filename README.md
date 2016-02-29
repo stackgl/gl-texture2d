@@ -123,7 +123,7 @@ If `texUnit` is not specified then the active texture is not changed.
 
 **Returns** The texture unit the texture is bound to.
 
-### `tex.dispose()``
+### `tex.dispose()`
 Destroys the texture object and releases all of its resources.  Under the hood this is equivalent to:
 
 ```javascript
