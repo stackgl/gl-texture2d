@@ -155,7 +155,7 @@ Object.defineProperties(proto, {
       var psamples = this._anisoSamples
       this._anisoSamples = Math.max(i, 1)|0
       if(psamples !== this._anisoSamples) {
-        var ext = gl.getExtension('EXT_texture_filter_anisotropic')
+        var ext = this.gl.getExtension('EXT_texture_filter_anisotropic')
         if(ext) {
           this.gl.texParameterf(this.gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, this._anisoSamples)
         }
