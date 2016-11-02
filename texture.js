@@ -32,6 +32,14 @@ function lazyInitLinearTypes(gl) {
   ]
 }
 
+function acceptTextureDOM (obj) {
+  return (
+    ('undefined' != typeof HTMLCanvasElement && obj instanceof HTMLCanvasElement) ||
+    ('undefined' != typeof HTMLImageElement && obj instanceof HTMLImageElement) ||
+    ('undefined' != typeof HTMLVideoElement && obj instanceof HTMLVideoElement) ||
+    ('undefined' != typeof ImageData && obj instanceof ImageData))
+}
+
 var convertFloatToUint8 = function(out, inp) {
   ops.muls(out, inp, 255.0)
 }
@@ -295,10 +303,7 @@ proto.setPixels = function(data, x_off, y_off, mip_level) {
     y_off = y_off || 0
   }
   mip_level = mip_level || 0
-  if(data instanceof HTMLCanvasElement ||
-     data instanceof ImageData ||
-     data instanceof HTMLImageElement ||
-     data instanceof HTMLVideoElement) {
+  if(acceptTextureDOM(data)) {
     var needsMip = this._mipLevels.indexOf(mip_level) < 0
     if(needsMip) {
       gl.texImage2D(gl.TEXTURE_2D, 0, this.format, this.format, this.type, data)
@@ -544,10 +549,7 @@ function createTexture2D(gl) {
   }
   if(typeof arguments[1] === 'object') {
     var obj = arguments[1]
-    if(obj instanceof HTMLCanvasElement ||
-       obj instanceof HTMLImageElement ||
-       obj instanceof HTMLVideoElement ||
-       obj instanceof ImageData) {
+    if (acceptTextureDOM(obj)) {
       return createTextureDOM(gl, obj, arguments[2]||gl.RGBA, arguments[3]||gl.UNSIGNED_BYTE)
     } else if(obj.shape && obj.data && obj.stride) {
       return createTextureArray(gl, obj)
