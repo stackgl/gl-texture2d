@@ -87,6 +87,12 @@ Creates a texture from the given data source.  Where `domElement` is one of the 
 
 And `format` is an OpenGL data format or defaults to `gl.RGBA` and `type` is the storage type which defaults to `gl.UNSIGNED_BYTE`
 
+### `var tex = createTexture(gl, rawObject[, format, type])`
+
+Creates a texture from the given raw element. `rawObject` is a DOM-like element that have a `raw`, `width` and `height` fields. `raw` is a value that directly get passed to `texImage2D` / `texSubImage2D`.
+
+This allows to support non-DOM implementation of WebGL like gl-headless.
+
 ### `var tex = createTexture(gl, array)`
 Creates a texture from an [ndarray](https://github.com/mikolalysenko/ndarray).  The rules for selecting the format and type depend on the shape of the ndarray.  The type of the texture is inferred according to the following rules.  Let:
 
@@ -131,7 +137,7 @@ gl.deleteTexture(this.handle)
 ```
 
 ### `tex.setPixels(data[, offset, mipLevel])`
-Unpacks `data` into a subregion of the texture.  As before in the constructor `data` can be either an `ndarray`, `HTMLCanvas`, `HTMLImage` or `HTMLVideo` object.  If `data` is an ndarray it must have a compatible format with the initial array layout.
+Unpacks `data` into a subregion of the texture.  As before in the constructor `data` can be either an `ndarray`, `HTMLCanvas`, `HTMLImage`, `HTMLVideo` or a `rawObject`.  If `data` is an ndarray it must have a compatible format with the initial array layout.
 
 * `offset` is a length 2 array representing the offset into which the pixels will be written in `[x,y]`.  (Default: `[0,0]`)
 * `mipLevel` is the mip level to write to. (Default `0`)
